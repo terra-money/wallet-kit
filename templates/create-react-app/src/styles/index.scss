@@ -1,0 +1,71 @@
+@use '_colors.scss';
+@use '_fonts.scss';
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Gotham;
+  font-feature-settings: 'tnum';
+  line-height: 1.5;
+  margin: 0;
+}
+
+header {
+  background-color: var(--menu-bg);
+  color: var(--menu-text);
+  padding: 1rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+main {
+  padding: 1rem;
+
+  button {
+    cursor: pointer;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border: 0;
+    padding: .8rem 1.8rem;
+    border-radius: var(--border-radius);
+    font-size: 11pt;
+  }
+
+  .wallet__details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .installed {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .not__installed {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .initializing {
+      color: var(--warning);
+      font-weight: 600;
+    }
+  }
+
+  .wallet__info {
+    code {
+      display: block;
+      padding: 1rem;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--card-border);
+
+      pre {
+        max-height: 300px;
+        overflow-y: scroll;
+      }
+    }
+  }
+}
