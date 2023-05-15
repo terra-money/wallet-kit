@@ -1,5 +1,6 @@
 import {
   ConnectResponse,
+  EventTypes,
   InfoResponse,
   Wallet,
 } from '@terra-money/wallet-interface'
@@ -72,6 +73,35 @@ export function WalletProvider({
           network,
         })
       })()
+
+      const networkCallback = (network: InfoResponse) => {
+        wallet.connect().then((w) =>
+          setState({
+            status: WalletProviderStatus.CONNECTED,
+            wallet,
+            connectedWallet: w,
+            network,
+          }),
+        )
+      }
+      wallet.addListener(EventTypes.NetworkChange, networkCallback)
+
+      const walletCallback = (connectedWallet: ConnectResponse) => {
+        wallet.info().then((network) =>
+          setState({
+            status: WalletProviderStatus.CONNECTED,
+            wallet,
+            connectedWallet,
+            network,
+          }),
+        )
+      }
+      wallet.addListener(EventTypes.WalletChange, walletCallback)
+
+      return () => {
+        wallet.removeListener(EventTypes.NetworkChange, networkCallback)
+        wallet.removeListener(EventTypes.WalletChange, walletCallback)
+      }
     } else {
       setState({
         status: WalletProviderStatus.NOT_CONNECTED,

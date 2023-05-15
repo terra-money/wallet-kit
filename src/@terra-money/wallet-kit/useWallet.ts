@@ -1,3 +1,8 @@
+import {
+  ConnectResponse,
+  EventTypes,
+  InfoResponse,
+} from '@terra-money/wallet-interface'
 import { WalletProviderStatus, useWalletProvider } from './WalletProvider'
 import { CreateTxOptions, LCDClient } from '@terra-money/feather.js'
 
@@ -23,6 +28,32 @@ export function useWallet() {
 
   const { wallet, connectedWallet: _, ...providerState } = state
 
+  const networkCallback = (network: InfoResponse) => {
+    if (!wallet) return
+
+    wallet.connect().then((w) =>
+      setState({
+        status: WalletProviderStatus.CONNECTED,
+        wallet,
+        connectedWallet: w,
+        network,
+      }),
+    )
+  }
+
+  const walletCallback = (connectedWallet: ConnectResponse) => {
+    if (!wallet) return
+
+    wallet.info().then((network) =>
+      setState({
+        status: WalletProviderStatus.CONNECTED,
+        wallet,
+        connectedWallet,
+        network,
+      }),
+    )
+  }
+
   const connect = async (id: string = 'station-extension') => {
     const wallet = wallets.find((w) => w.id === id)
 
@@ -42,11 +73,18 @@ export function useWallet() {
       network,
     })
 
+    wallet.addListener(EventTypes.NetworkChange, networkCallback)
+    wallet.addListener(EventTypes.WalletChange, walletCallback)
+
     localStorage.setItem('__wallet_kit_connected_wallet', id)
   }
 
   const disconnect = () => {
+    wallet?.removeListener(EventTypes.NetworkChange, networkCallback)
+    wallet?.removeListener(EventTypes.WalletChange, walletCallback)
+
     localStorage.removeItem('__wallet_kit_connected_wallet')
+
     setState((s) => ({
       status: WalletProviderStatus.NOT_CONNECTED,
       network: s.network,
