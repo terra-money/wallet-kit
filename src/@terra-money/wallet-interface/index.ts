@@ -33,7 +33,6 @@ export enum EventTypes {
 
 export interface Wallet {
   id: string
-
   isInstalled?: boolean
 
   // methods
@@ -44,12 +43,11 @@ export interface Wallet {
 
   // events
   addListener: (event: EventTypes, cb: (data: any) => void) => void
-
   removeListener: (event: EventTypes, cb: (data: any) => void) => void
 
   details: {
     name: string
     icon: string
-    website: string
+    website?: string
   }
 }

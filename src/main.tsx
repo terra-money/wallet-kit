@@ -8,6 +8,7 @@ import {
   useWallet,
 } from '@terra-money/wallet-kit'
 import ConnectWallet from 'components/ConnectWallet'
+import PostTx from 'components/PostTx'
 
 function App() {
   const { network, status } = useWallet()
@@ -37,6 +38,7 @@ function App() {
           </code>
         </section>
         <ConnectWallet />
+        <PostTx />
       </main>
     </div>
   )

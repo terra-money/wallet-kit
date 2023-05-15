@@ -39,7 +39,10 @@ export default class StationWallet implements Wallet {
     await this.extension.send('connect')
 
     return new Promise<ConnectResponse>((resolve) => {
-      this.pendingRequests['onConnect'] = resolve
+      this.pendingRequests['onConnect'] = (data) => {
+        delete data['address']
+        resolve(data)
+      }
     })
   }
 
@@ -51,7 +54,9 @@ export default class StationWallet implements Wallet {
     const data = JSON.parse(
       JSON.stringify({
         ...tx,
-        msgs: tx.msgs.map((msg) => msg.toData(isClassic)),
+        msgs: tx.msgs.map((msg) => JSON.stringify(msg.toData(isClassic))),
+        purgeQueue: true,
+        id: Date.now(),
       }),
     )
 
@@ -70,7 +75,9 @@ export default class StationWallet implements Wallet {
     const data = JSON.parse(
       JSON.stringify({
         ...tx,
-        msgs: tx.msgs.map((msg) => msg.toData(isClassic)),
+        msgs: tx.msgs.map((msg) => JSON.stringify(msg.toData(isClassic))),
+        purgeQueue: true,
+        id: Date.now(),
       }),
     )
 
@@ -97,7 +104,7 @@ export default class StationWallet implements Wallet {
     }
   }
 
-  removeListener(event: EventTypes, cb: (data: any) => void) {
+  removeListener(event: EventTypes, _?: (data: any) => void) {
     const listener = this.listeners[event]
     if (!listener) return
 
