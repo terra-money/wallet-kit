@@ -11,6 +11,8 @@ export type ConnectResponse = {
   addresses: Record<ChainID, AccAddress>
   ledger?: boolean
   name?: string
+  network?: string
+  theme?: string
 }
 export type PostResponse = {
   id: number

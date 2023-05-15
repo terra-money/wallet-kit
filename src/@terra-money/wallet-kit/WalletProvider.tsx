@@ -11,6 +11,7 @@ import StationWallet from '@terra-money/station-wallet'
 const [useWalletProvider, WalletProviderContext] = createContext<{
   wallets: Wallet[]
   state: WalletProviderState
+  defaultNetworks: InfoResponse
   setState: React.Dispatch<React.SetStateAction<WalletProviderState>>
 }>('useWalletProvider')
 
@@ -116,6 +117,7 @@ export function WalletProvider({
         wallets: availableWallets,
         state,
         setState,
+        defaultNetworks
       }}
     >
       {children}

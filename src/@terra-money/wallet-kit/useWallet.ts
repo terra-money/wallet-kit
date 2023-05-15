@@ -24,7 +24,7 @@ export function useConnectedWallet() {
 }
 
 export function useWallet() {
-  const { wallets, state, setState } = useWalletProvider()
+  const { wallets, state, setState, defaultNetworks } = useWalletProvider()
 
   const { wallet, connectedWallet: _, ...providerState } = state
 
@@ -87,7 +87,7 @@ export function useWallet() {
 
     setState((s) => ({
       status: WalletProviderStatus.NOT_CONNECTED,
-      network: s.network,
+      network: defaultNetworks,
     }))
   }
 
