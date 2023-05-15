@@ -21,15 +21,29 @@ export default class StationWallet implements Wallet {
   }
 
   async info() {
-    const { payload } = await this.extension.request('interchain-info')
+    await this.extension.send('interchain-info')
 
-    return payload as InfoResponse
+    return new Promise<InfoResponse>((resolve) => {
+      // @ts-expect-error
+      this.extension.on((d, name) => {
+        if (name === 'onInterchainInfo') {
+          resolve(d as InfoResponse)
+        }
+      })
+    })
   }
 
   async connect() {
-    const { payload } = await this.extension.request('connect')
+    await this.extension.send('connect')
 
-    return payload as ConnectResponse
+    return new Promise<ConnectResponse>((resolve) => {
+      // @ts-expect-error
+      this.extension.on((d, name) => {
+        if (name === 'onConnect') {
+          resolve(d as ConnectResponse)
+        }
+      })
+    })
   }
 
   async post(tx: CreateTxOptions) {
@@ -43,9 +57,17 @@ export default class StationWallet implements Wallet {
         msgs: tx.msgs.map((msg) => msg.toData(isClassic)),
       }),
     )
-    const { payload } = await this.extension.request('post', data)
+    
+    await this.extension.send('post', data)
 
-    return payload as PostResponse
+    return new Promise<PostResponse>((resolve) => {
+      // @ts-expect-error
+      this.extension.on((d, name) => {
+        if (name === 'onPost') {
+          resolve(d as PostResponse)
+        }
+      })
+    })
   }
 
   async sign(tx: CreateTxOptions) {
@@ -59,9 +81,17 @@ export default class StationWallet implements Wallet {
         msgs: tx.msgs.map((msg) => msg.toData(isClassic)),
       }),
     )
-    const { payload } = await this.extension.request('sign', data)
+    
+    await this.extension.send('sign', data)
 
-    return payload as PostResponse
+    return new Promise<PostResponse>((resolve) => {
+      // @ts-expect-error
+      this.extension.on((d, name) => {
+        if (name === 'onSign') {
+          resolve(d as PostResponse)
+        }
+      })
+    })
   }
 
   addListener(event: EventTypes, cb: (data: any) => void) {

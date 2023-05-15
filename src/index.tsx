@@ -1,4 +1,5 @@
 //@ts-ignore
-window.global = window;
+window.global = window
 
-import('./polyfills/polyfills').then(() => import('./main'));
+import('./main')
+//import('./polyfills/polyfills').then(() => import('./main'));

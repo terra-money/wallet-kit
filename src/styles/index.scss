@@ -47,6 +47,11 @@ main {
       color: var(--danger);
       font-weight: 600;
     }
+
+    .initializing {
+      color: var(--warning);
+      font-weight: 600;
+    }
   }
 
   .wallet__info {
