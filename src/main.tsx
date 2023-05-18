@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import 'styles/index.scss'
 import {
   WalletProvider,
-  WalletProviderStatus,
+  WalletStatus,
   getInitialConfig,
   useWallet,
 } from '@terra-money/wallet-kit'
@@ -22,11 +22,11 @@ function App() {
         <section className='wallet__details'>
           {(() => {
             switch (status) {
-              case WalletProviderStatus.NOT_CONNECTED:
+              case WalletStatus.NOT_CONNECTED:
                 return <p className='not__installed'>NOT CONNECTED</p>
-              case WalletProviderStatus.CONNECTED:
+              case WalletStatus.CONNECTED:
                 return <p className='installed'>CONNECTED</p>
-              case WalletProviderStatus.INITIALIZING:
+              case WalletStatus.INITIALIZING:
                 return <p className='initializing'>INITIALIZING</p>
             }
           })()}

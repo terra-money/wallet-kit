@@ -3,7 +3,7 @@ import {
   EventTypes,
   InfoResponse,
 } from '@terra-money/wallet-interface'
-import { WalletProviderStatus, useWalletProvider } from './WalletProvider'
+import { WalletStatus, useWalletProvider } from './WalletProvider'
 import { CreateTxOptions, LCDClient } from '@terra-money/feather.js'
 
 export function useNetworks() {
@@ -33,7 +33,7 @@ export function useWallet() {
 
     wallet.connect().then((w) =>
       setState({
-        status: WalletProviderStatus.CONNECTED,
+        status: WalletStatus.CONNECTED,
         wallet,
         connectedWallet: w,
         network,
@@ -46,7 +46,7 @@ export function useWallet() {
 
     wallet.info().then((network) =>
       setState({
-        status: WalletProviderStatus.CONNECTED,
+        status: WalletStatus.CONNECTED,
         wallet,
         connectedWallet,
         network,
@@ -67,7 +67,7 @@ export function useWallet() {
     ])
 
     setState({
-      status: WalletProviderStatus.CONNECTED,
+      status: WalletStatus.CONNECTED,
       wallet,
       connectedWallet,
       network,
@@ -86,13 +86,13 @@ export function useWallet() {
     localStorage.removeItem('__wallet_kit_connected_wallet')
 
     setState((s) => ({
-      status: WalletProviderStatus.NOT_CONNECTED,
+      status: WalletStatus.NOT_CONNECTED,
       network: defaultNetworks,
     }))
   }
 
   const post = async (tx: CreateTxOptions) => {
-    if (providerState.status !== WalletProviderStatus.CONNECTED || !wallet)
+    if (providerState.status !== WalletStatus.CONNECTED || !wallet)
       throw new Error('Wallet not connected')
 
     const { result } = await wallet.post(tx)
@@ -101,7 +101,7 @@ export function useWallet() {
   }
 
   const sign = async (tx: CreateTxOptions) => {
-    if (providerState.status !== WalletProviderStatus.CONNECTED || !wallet)
+    if (providerState.status !== WalletStatus.CONNECTED || !wallet)
       throw new Error('Wallet not connected')
 
     const { result } = await wallet.sign(tx)

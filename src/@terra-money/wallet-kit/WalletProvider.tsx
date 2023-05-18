@@ -21,7 +21,7 @@ interface WalletProviderProps {
   extraWallets?: Wallet[]
 }
 
-export enum WalletProviderStatus {
+export enum WalletStatus {
   CONNECTED = 'CONNECTED',
   NOT_CONNECTED = 'NOT_CONNECTED',
   INITIALIZING = 'INITIALIZING',
@@ -29,15 +29,15 @@ export enum WalletProviderStatus {
 
 type WalletProviderState =
   | {
-      status: WalletProviderStatus.CONNECTED
+      status: WalletStatus.CONNECTED
       wallet: Wallet
       connectedWallet: ConnectResponse
       network: InfoResponse
     }
   | {
       status:
-        | WalletProviderStatus.INITIALIZING
-        | WalletProviderStatus.NOT_CONNECTED
+        | WalletStatus.INITIALIZING
+        | WalletStatus.NOT_CONNECTED
       network: InfoResponse
       wallet?: undefined
       connectedWallet?: undefined
@@ -51,7 +51,7 @@ export function WalletProvider({
   const availableWallets = [new StationWallet(), ...(extraWallets ?? [])]
 
   const [state, setState] = useState<WalletProviderState>({
-    status: WalletProviderStatus.INITIALIZING,
+    status: WalletStatus.INITIALIZING,
     network: defaultNetworks,
   })
 
@@ -68,7 +68,7 @@ export function WalletProvider({
         ])
 
         setState({
-          status: WalletProviderStatus.CONNECTED,
+          status: WalletStatus.CONNECTED,
           wallet,
           connectedWallet,
           network,
@@ -78,7 +78,7 @@ export function WalletProvider({
       const networkCallback = (network: InfoResponse) => {
         wallet.connect().then((w) =>
           setState({
-            status: WalletProviderStatus.CONNECTED,
+            status: WalletStatus.CONNECTED,
             wallet,
             connectedWallet: w,
             network,
@@ -90,7 +90,7 @@ export function WalletProvider({
       const walletCallback = (connectedWallet: ConnectResponse) => {
         wallet.info().then((network) =>
           setState({
-            status: WalletProviderStatus.CONNECTED,
+            status: WalletStatus.CONNECTED,
             wallet,
             connectedWallet,
             network,
@@ -105,7 +105,7 @@ export function WalletProvider({
       }
     } else {
       setState({
-        status: WalletProviderStatus.NOT_CONNECTED,
+        status: WalletStatus.NOT_CONNECTED,
         network: defaultNetworks,
       })
     }
