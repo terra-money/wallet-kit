@@ -2,11 +2,14 @@ import {
   AccAddress,
   CreateTxOptions,
   LCDClientConfig,
-  Msg,
-  SignerData,
   Tx,
 } from '@terra-money/feather.js'
-import { WalletStatus } from '@terra-money/wallet-kit'
+
+export declare enum WalletStatus {
+  NOT_CONNECTED = 'NOT_CONNECTED',
+  INITIALIZING = 'INITIALIZING',
+  CONNECTED = 'CONNECTED',
+}
 
 type ChainID = string
 export type InfoResponse = Record<ChainID, LCDClientConfig>

@@ -3,6 +3,7 @@ import {
   EventTypes,
   InfoResponse,
   Wallet,
+  WalletStatus
 } from '@terra-money/wallet-interface'
 import createContext from './utils/createContext'
 import React, { useEffect, useState } from 'react'
@@ -21,11 +22,6 @@ interface WalletProviderProps {
   extraWallets?: Wallet[]
 }
 
-export enum WalletStatus {
-  CONNECTED = 'CONNECTED',
-  NOT_CONNECTED = 'NOT_CONNECTED',
-  INITIALIZING = 'INITIALIZING',
-}
 
 type WalletProviderState =
   | {

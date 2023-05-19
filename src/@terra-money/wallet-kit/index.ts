@@ -1,4 +1,4 @@
 export * from "./initialConfig"
 export * from "./useWallet"
 export * from "./WalletProvider"
-export * from "../wallet-interface"
+export * from './types'

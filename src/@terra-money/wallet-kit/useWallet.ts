@@ -3,8 +3,9 @@ import {
   EventTypes,
   InfoResponse,
   WalletResponse,
+  WalletStatus
 } from '@terra-money/wallet-interface'
-import { WalletStatus, useWalletProvider } from './WalletProvider'
+import {  useWalletProvider } from './WalletProvider'
 import { CreateTxOptions, LCDClient } from '@terra-money/feather.js'
 
 export function useNetworks() {
