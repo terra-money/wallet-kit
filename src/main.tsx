@@ -9,6 +9,7 @@ import {
 } from '@terra-money/wallet-kit'
 import ConnectWallet from 'components/ConnectWallet'
 import PostTx from 'components/PostTx'
+import SignTx from 'components/SignTx'
 
 function App() {
   const { network, status } = useWallet()
@@ -39,6 +40,7 @@ function App() {
         </section>
         <ConnectWallet />
         <PostTx />
+        <SignTx />
       </main>
     </div>
   )

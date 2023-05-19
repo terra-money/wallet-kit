@@ -1,38 +1,38 @@
 import React, {useState} from 'react'
-import { PostResponse, useConnectedWallet, useWallet } from '@terra-money/wallet-kit'
-import { MsgSend } from '@terra-money/feather.js'
+import { useConnectedWallet, useWallet } from '@terra-money/wallet-kit'
+import { MsgSend, Tx } from '@terra-money/feather.js'
 
-export default function PostTx() {
+export default function SignTx() {
   const connectedWallet = useConnectedWallet()
-  const { post } = useWallet()
-  const [postRes, setPostRes] = useState<PostResponse>()
+  const { sign } = useWallet()
+  const [signRes, setSignRes] = useState<Tx>()
   
   const fromAddress = connectedWallet && connectedWallet?.addresses['pisco-1']
   const toAddress = 'terra1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq486l9a'
 
-  const postTx = async () => {
+  const signTx = async () => {
     if (!fromAddress) return
     const msg =  new MsgSend(fromAddress, toAddress, { uluna: 1 })
-    const res = await post({ chainID: 'pisco-1',  msgs: [msg]})
-    setPostRes(res)
+    const res = await sign({ chainID: 'pisco-1',  msgs: [msg]})
+    setSignRes(res)
   }
 
   return (
     <section className='wallet__info'>
-      <h4>Post tx:</h4>
+      <h4>Sign tx:</h4>
       {fromAddress ? (
         <>
           <p>
-            Send 1uluna to <b>{toAddress}</b>
+            Sign 1uluna SendTx to <b>{toAddress}</b>
           </p>
-          <button onClick={postTx}>
+          <button onClick={signTx}>
             Confirm
           </button>
         </>
       ) : (
         <p>Connect your wallet and switch to testnet first</p>
       )}
-      {postRes && <p>{JSON.stringify(postRes, null, 2)}</p>}
+      {signRes && <p>{JSON.stringify(signRes, null, 2)}</p>}
     </section>
   )
 }
