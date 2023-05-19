@@ -3,6 +3,8 @@ import {
   CreateTxOptions,
   LCDClientConfig,
   Msg,
+  SignerData,
+  Tx,
 } from '@terra-money/feather.js'
 import { WalletStatus } from '@terra-money/wallet-kit'
 
@@ -27,20 +29,8 @@ export type WalletResponse = {
       icon: string;
       website?: string | undefined;
   }[];
-  post: (tx: CreateTxOptions) => Promise<{
-      height: string;
-      txhash: string;
-      raw_log: string;
-      code: string | number;
-      codespace: string;
-  } | undefined>;
-  sign: (tx: CreateTxOptions) => Promise<{
-      height: string;
-      txhash: string;
-      raw_log: string;
-      code: string | number;
-      codespace: string;
-  } | undefined>;
+  post: (tx: CreateTxOptions) => Promise<PostResponse>;
+  sign: (tx: CreateTxOptions) => Promise<Tx>;
 }
 export type PostResponse = {
   id: number
@@ -68,8 +58,8 @@ export interface Wallet {
   // methods
   info: () => Promise<InfoResponse>
   connect: () => Promise<ConnectResponse>
-  post: (tx: CreateTxOptions) => Promise<PostResponse>
-  sign: (tx: CreateTxOptions) => Promise<PostResponse>
+  post: (tx: CreateTxOptions) => Promise<PostResponse> 
+  sign: (tx: CreateTxOptions) => Promise<Tx>
 
   // events
   addListener: (event: EventTypes, cb: (data: any) => void) => void

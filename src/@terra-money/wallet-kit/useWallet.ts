@@ -96,8 +96,7 @@ export function useWallet(): WalletResponse {
     if (providerState.status !== WalletStatus.CONNECTED || !wallet)
       throw new Error('Wallet not connected')
 
-    const { result } = await wallet.post(tx)
-
+    const result = await wallet.post(tx)
     return result
   }
 
@@ -105,8 +104,7 @@ export function useWallet(): WalletResponse {
     if (providerState.status !== WalletStatus.CONNECTED || !wallet)
       throw new Error('Wallet not connected')
 
-    const { result } = await wallet.sign(tx)
-
+    const result = await wallet.sign(tx)
     return result
   }
 
