@@ -2,8 +2,10 @@ import {
   ConnectResponse,
   EventTypes,
   InfoResponse,
+  WalletResponse,
+  WalletStatus
 } from '@terra-money/wallet-interface'
-import { WalletStatus, useWalletProvider } from './WalletProvider'
+import {  useWalletProvider } from './WalletProvider'
 import { CreateTxOptions, LCDClient } from '@terra-money/feather.js'
 
 export function useNetworks() {
@@ -23,7 +25,7 @@ export function useConnectedWallet() {
   return state.connectedWallet
 }
 
-export function useWallet() {
+export function useWallet(): WalletResponse {
   const { wallets, state, setState, defaultNetworks } = useWalletProvider()
 
   const { wallet, connectedWallet: _, ...providerState } = state
@@ -95,8 +97,7 @@ export function useWallet() {
     if (providerState.status !== WalletStatus.CONNECTED || !wallet)
       throw new Error('Wallet not connected')
 
-    const { result } = await wallet.post(tx)
-
+    const result = await wallet.post(tx)
     return result
   }
 
@@ -104,8 +105,7 @@ export function useWallet() {
     if (providerState.status !== WalletStatus.CONNECTED || !wallet)
       throw new Error('Wallet not connected')
 
-    const { result } = await wallet.sign(tx)
-
+    const result = await wallet.sign(tx)
     return result
   }
 

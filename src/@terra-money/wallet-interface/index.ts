@@ -2,8 +2,14 @@ import {
   AccAddress,
   CreateTxOptions,
   LCDClientConfig,
-  Msg,
+  Tx,
 } from '@terra-money/feather.js'
+
+export declare enum WalletStatus {
+  NOT_CONNECTED = 'NOT_CONNECTED',
+  INITIALIZING = 'INITIALIZING',
+  CONNECTED = 'CONNECTED',
+}
 
 type ChainID = string
 export type InfoResponse = Record<ChainID, LCDClientConfig>
@@ -13,6 +19,21 @@ export type ConnectResponse = {
   name?: string
   network?: string
   theme?: string
+}
+export type WalletResponse = {
+  status: WalletStatus.CONNECTED | WalletStatus.NOT_CONNECTED | WalletStatus.INITIALIZING;
+  network: InfoResponse;
+  connect: (id?: string) => Promise<void>;
+  disconnect: () => void;
+  availableWallets: {
+      id: string;
+      isInstalled: boolean | undefined;
+      name: string;
+      icon: string;
+      website?: string | undefined;
+  }[];
+  post: (tx: CreateTxOptions) => Promise<PostResponse>;
+  sign: (tx: CreateTxOptions) => Promise<Tx>;
 }
 export type PostResponse = {
   id: number
@@ -40,8 +61,8 @@ export interface Wallet {
   // methods
   info: () => Promise<InfoResponse>
   connect: () => Promise<ConnectResponse>
-  post: (tx: CreateTxOptions) => Promise<PostResponse>
-  sign: (tx: CreateTxOptions) => Promise<PostResponse>
+  post: (tx: CreateTxOptions) => Promise<PostResponse> 
+  sign: (tx: CreateTxOptions) => Promise<Tx>
 
   // events
   addListener: (event: EventTypes, cb: (data: any) => void) => void

@@ -5,7 +5,7 @@ import {
   PostResponse,
   Wallet,
 } from '@terra-money/wallet-interface'
-import { CreateTxOptions, Extension } from '@terra-money/feather.js'
+import { CreateTxOptions, Extension, Tx } from '@terra-money/feather.js'
 
 declare global {
   interface Window {
@@ -83,7 +83,7 @@ export default class StationWallet implements Wallet {
 
     await this.extension.send('sign', data)
 
-    return new Promise<PostResponse>((resolve) => {
+    return new Promise<Tx>((resolve) => {
       this.pendingRequests['onSign'] = resolve
     })
   }
