@@ -20,21 +20,7 @@ export type ConnectResponse = {
   network?: string
   theme?: string
 }
-export type WalletResponse = {
-  status: WalletStatus.CONNECTED | WalletStatus.NOT_CONNECTED | WalletStatus.INITIALIZING;
-  network: InfoResponse;
-  connect: (id?: string) => Promise<void>;
-  disconnect: () => void;
-  availableWallets: {
-      id: string;
-      isInstalled: boolean | undefined;
-      name: string;
-      icon: string;
-      website?: string | undefined;
-  }[];
-  post: (tx: CreateTxOptions) => Promise<PostResponse>;
-  sign: (tx: CreateTxOptions) => Promise<Tx>;
-}
+
 export type PostResponse = {
   id: number
   origin: string
