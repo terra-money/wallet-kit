@@ -5,8 +5,8 @@ import {
   WalletProvider,
   getInitialConfig,
   useWallet,
+  WalletStatus
 } from '@terra-money/wallet-kit'
-import {WalletStatus} from './@terra-money/wallet-interface'
 
 import ConnectWallet from 'components/ConnectWallet'
 import PostTx from 'components/PostTx'
