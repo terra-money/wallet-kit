@@ -19,11 +19,11 @@ export default function SignTx() {
 
   return (
     <section className='wallet__info'>
-      <h4>Sign tx:</h4>
+      <h4>Sign tx</h4>
       {fromAddress ? (
         <>
           <p>
-            Sign 1uluna SendTx to <b>{toAddress}</b>
+            Sign send tx to <b>{toAddress}</b>
           </p>
           <button onClick={signTx}>
             Confirm

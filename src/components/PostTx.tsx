@@ -19,7 +19,7 @@ export default function PostTx() {
 
   return (
     <section className='wallet__info'>
-      <h4>Post tx:</h4>
+      <h4>Post tx</h4>
       {fromAddress ? (
         <>
           <p>
