@@ -2,11 +2,10 @@ import {
   ConnectResponse,
   EventTypes,
   InfoResponse,
-  WalletResponse,
-  WalletStatus
 } from '@terra-money/wallet-interface'
-import {  useWalletProvider } from './WalletProvider'
+import {  useWalletProvider, WalletStatus } from './WalletProvider'
 import { CreateTxOptions, LCDClient } from '@terra-money/feather.js'
+
 
 export function useNetworks() {
   const { state } = useWalletProvider()
@@ -15,17 +14,15 @@ export function useNetworks() {
 
 export function useLcdClient() {
   const networks = useNetworks()
-
   return new LCDClient(networks)
 }
 
 export function useConnectedWallet() {
   const { state } = useWalletProvider()
-
   return state.connectedWallet
 }
 
-export function useWallet(): WalletResponse {
+export function useWallet() {
   const { wallets, state, setState, defaultNetworks } = useWalletProvider()
 
   const { wallet, connectedWallet: _, ...providerState } = state
