@@ -295,25 +295,22 @@ export interface Wallet {
 <summary><code>useConnectedWallet()</code></summary>
 
 ```jsx
-import { useConnectedWallet } from '@terra-money/wallet-provider'
+import { useConnectedWallet } from '@terra-money/wallet-kit'
 
 function Component() {
-  const connectedWallet = useConnectedWallet()
-
-  const postTx = useCallback(async () => {
-    if (!connectedWallet) return
-
-    console.log('wallet addresses are', Object.values(connectedWallet.addresses))
-    console.log('network is', connectedWallet.network)
-    console.log('connectType is', connectedWallet.connectType)
-
-    const result = await connectedWallet.post({...})
-  }, [])
-
+  const connected = useConnectedWallet()
+  
+  if (!connected) return <div> Not Connected </div>
+  
+  const isLedger = connected.ledger
+  const walletName = connected.name
+  const networkName = connected.network // mainnet, testnet, classic, localterra
+  
   return (
-    <button disabled={!connectedWallet || !connectedWallet.availablePost} onClick={() => postTx}>
-      Post Tx
-    </button>
+  <>
+    <div> name: {walletName} network: {networkName} ledger: {isLedger} </div>
+    {Object.keys(connected.addresses).map((chainID) => <p> connected.addresses[chainID] </p>)}
+  </>
   )
 }
 ```
@@ -322,10 +319,14 @@ function Component() {
 
 <details>
 
+  
+  
+  
+  // stop here
 <summary><code>useLCDClient()</code></summary>
 
 ```jsx
-import { useLCDClient } from '@terra-money/wallet-provider';
+import { useLCDClient } from '@terra-money/wallet-kit';
 
 function Component() {
   const lcd = useLCDClient();
