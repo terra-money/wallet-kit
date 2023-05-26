@@ -5,13 +5,15 @@ import {
   Tx,
 } from '@terra-money/feather.js'
 
-export declare enum WalletStatus {
-  NOT_CONNECTED = 'NOT_CONNECTED',
-  INITIALIZING = 'INITIALIZING',
-  CONNECTED = 'CONNECTED',
-}
-
 type ChainID = string
+type TxResult = {
+  height: string;
+  txhash: string;
+  raw_log: string;
+  code: string | number;
+  codespace: string;
+} | undefined
+
 export type InfoResponse = Record<ChainID, LCDClientConfig>
 export type ConnectResponse = {
   addresses: Record<ChainID, AccAddress>
@@ -20,8 +22,9 @@ export type ConnectResponse = {
   network?: string
   theme?: string
 }
-export type WalletResponse = {
-  status: WalletStatus.CONNECTED | WalletStatus.NOT_CONNECTED | WalletStatus.INITIALIZING;
+
+export interface WalletResponse {
+  status: string;
   network: InfoResponse;
   connect: (id?: string) => Promise<void>;
   disconnect: () => void;
@@ -32,20 +35,14 @@ export type WalletResponse = {
       icon: string;
       website?: string | undefined;
   }[];
-  post: (tx: CreateTxOptions) => Promise<PostResponse>;
-  sign: (tx: CreateTxOptions) => Promise<Tx>;
+  post: (tx: CreateTxOptions) => Promise<TxResult>;
+  sign: (tx: CreateTxOptions) => Promise<TxResult>;
 }
 export type PostResponse = {
   id: number
   origin: string
   success: boolean
-  result?: {
-    height: string
-    txhash: string
-    raw_log: string
-    code: number | string
-    codespace: string
-  }
+  result?: TxResult
   error?: { code: number; message?: string }
 }
 
