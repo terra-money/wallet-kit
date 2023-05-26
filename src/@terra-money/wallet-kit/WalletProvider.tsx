@@ -8,7 +8,7 @@ import createContext from './utils/createContext'
 import React, { useEffect, useState } from 'react'
 import StationWallet from '@terra-money/station-wallet'
 
-export declare enum WalletStatus {
+enum WalletStatus {
   NOT_CONNECTED = 'NOT_CONNECTED',
   INITIALIZING = 'INITIALIZING',
   CONNECTED = 'CONNECTED',
@@ -43,7 +43,7 @@ type WalletProviderState =
       connectedWallet?: undefined
     }
 
-export function WalletProvider({
+function WalletProvider({
   children,
   extraWallets,
   defaultNetworks,
@@ -125,4 +125,4 @@ export function WalletProvider({
   )
 }
 
-export { useWalletProvider }
+export { useWalletProvider, WalletStatus, WalletProvider }
