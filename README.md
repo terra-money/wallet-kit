@@ -151,10 +151,7 @@ export interface WalletResponse {
    */
    network: InfoResponse;
   /**
-   * current selected network
-   *
-   * - if status is INITIALIZING or WALLET_NOT_CONNECTED = this will be the defaultNetwork
-   * - if status is WALLET_CONNECTED = this depends on the connected environment
+   * LCDCLientConfig information for all chains on the selected network
    */
     availableWallets: {
       id: string;
