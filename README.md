@@ -2,7 +2,7 @@
 
 A library for interacting with Station from React dApps. Additional features like signBytes, suggestNetwork, and switchNetwork are coming soon.
 
-# Basic Usage
+## Basic Usage
 
 First, please add `<meta name="terra-wallet" />` on your html page.
 
@@ -68,14 +68,14 @@ function Component() {
 
 Then, you can use hooks from `wallet-kit` like `useWallet()`, `useConnectedWallet()` and `useLCDClient()` anywhere in your app.
 
-# Key Differences with Wallet-Provider
+## Key Differences with Wallet-Provider
 
 - `useWallet()` returns `WalletResponse` instead of `Wallet` 
   - `availableWallets` instead of `availableConnectTypes` and `availableInstallTypes` and doesn't return `supportFeatures`.
   - other features like `supportFeatures` and `addNetwork` are not currently available 
 - wallet addresses are now found in `ConnectResponse` from `useConnectedWallet()`. `ConnectResponse` also now returns the wallet and network name.
 
-# API
+## API
 
 <details>
 
@@ -138,7 +138,7 @@ ReactDOM.render(
 This is a hook used to trigger core wallet functionality. 
 
 ````ts
-export interface Wallet {
+export interface WalletResponse {
   status: WalletStatus;
   /**
    * current client status
@@ -167,9 +167,9 @@ export interface Wallet {
    * available wallets that can be connected from the browser
    *
    */
-  connect: (id?: string) => <void>
+  connect: (id?: string) => void;
   /**
-   * use connect in conjunction with availablewallets to connect the wallet to the web page
+   * use connect in conjunction with availableWallets to connect the wallet to the web page
    *
    * @example
    * ```
@@ -190,13 +190,19 @@ export interface Wallet {
    */
   disconnect: () => void;
   /**
-   * reload the connected wallet states
-   *
-   * in this time, this only work on the ConnectType.EXTENSION
-   *
-   * @see WalletController#refetchStates
+     * disconnect
+     *
+     * @example
+     * ```
+     * const { status, disconnect } = useWallet()
+     *
+     * return status === WalletStatus.WALLET_CONNECTED &&
+     *  <button onClick={() => disconnect()}>
+     *    Disconnect
+     *  </button>
+     * ```
    */
-    post: (tx: createTxOptions) => Promise<PostResponse>;
+    post: (tx: CreateTxOptions) => Promise<PostResponse>;
   /**
    * post transaction
    *
@@ -258,7 +264,7 @@ export interface Wallet {
    * }, [])
    * ```
    *
-   * @param { txOptions } tx transaction data
+   * @param { CreateTxOptions } tx transaction data
    *
    * @return { Promise<Tx> }
    *
@@ -269,6 +275,7 @@ export interface Wallet {
    * @throws { TxUnspecifiedError } unknown error
    *
    */
+}
 ````
 
 <!-- /source -->
