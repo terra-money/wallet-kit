@@ -4,7 +4,6 @@ import {
   LCDClientConfig,
   Tx,
 } from '@terra-money/feather.js'
-import { WalletStatus } from '@terra-money/wallet-kit'
 
 type ChainID = string
 type TxResult = {
@@ -25,7 +24,7 @@ export type ConnectResponse = {
 }
 
 export interface WalletResponse {
-  status: WalletStatus;
+  status: string;
   /**
    * current client status
    *
