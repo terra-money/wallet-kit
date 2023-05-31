@@ -1,6 +1,6 @@
 # Wallet Kit
 
-A library for interacting with Station from React dApps.
+A library for interacting with Station from React dApps. Additional features like signBytes, suggestNetwork, and switchNetwork are coming soon.
 
 # Basic Usage
 
@@ -67,6 +67,13 @@ function Component() {
 ```
 
 Then, you can use hooks from `wallet-kit` like `useWallet()`, `useConnectedWallet()` and `useLCDClient()` anywhere in your app.
+
+# Key Differences with Wallet-Provider
+
+- `useWallet()` returns `WalletResponse` instead of `Wallet` 
+  - `availableWallets` instead of `availableConnectTypes` and `availableInstallTypes` and doesn't return `supportFeatures`.
+  - other features like `supportFeatures` and `addNetwork` are not currently available 
+- wallet addresses are now found in `ConnectResponse` from `useConnectedWallet()`. `ConnectResponse` also now returns the wallet and network name.
 
 # API
 
