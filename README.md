@@ -2,10 +2,6 @@
 
 A library for interacting with Station from React dApps.
 
-# Quick Start
-
-Use templates to get your projects started quickly
-
 # Basic Usage
 
 First, please add `<meta name="terra-wallet" />` on your html page.
