@@ -1,27 +1,16 @@
 # Wallet Kit
 
-Library to make React dApps easier using Station Extension or Station Mobile.
+A library for interacting with Station from React dApps.
 
 # Quick Start
 
 Use templates to get your projects started quickly
 
-### Create React App
-
-```sh
-npx terra-templates get wallet-provider:create-react-app your-app-name
-cd your-app-name
-yarn install
-yarn start
-```
-
-<https://github.com/terra-money/wallet-kit/tree/main/templates/create-react-app>
-
 # Basic Usage
 
 First, please add `<meta name="terra-wallet" />` on your html page.
 
-Since then, browser extensions (e.g. Station chrome extension) will not attempt to connect in a Web app where this `<meta name="terra-wallet">` tag is not found.
+Browser extensions (e.g. Station chrome extension) will not attempt to connect in a Web app where this `<meta name="terra-wallet">` tag is not found.
 
 ```html
 <html lang="en">
@@ -89,7 +78,7 @@ Then, you can use hooks from `wallet-kit` like `useWallet()`, `useConnectedWalle
 
 <summary><code>&lt;WalletProvider&gt;</code></summary>
   
-By default, `WalletProvider` supports chains and networks contained in the [station-assets](https://github.com/terra-money/station-assets/tree/main/chains) repository as returned by `getInitialConfig`. You can modify these by passing your own defaultNetworks object. 
+By default, `WalletProvider` supports chains and networks contained in the [station-assets](https://github.com/terra-money/station-assets/tree/main/chains) repository as returned by `getInitialConfig`. You can modify these by passing your own defaultNetworks. 
 
 ```jsx
 import { WalletProvider, InfoResponse, Wallet } from '@terra-money/wallet-kit';
@@ -109,8 +98,7 @@ const defaultNetworks: InfoResponse = {
   ...
   }
 };
-  
-  ```
+```
   
 `WalletProvider` includes Station wallet by default. You can pass additional wallets that implement the `Wallet` interface.
 ```
@@ -215,7 +203,7 @@ export interface Wallet {
    *
    * const callback = useCallback(async () => {
    *   try {
-   *    const result: PostResponse = await post({...txOptions})
+   *    const result: PostResponse = await post({ ...txOptions })
    *    // DO SOMETHING...
    *   } catch (error) {
    *     if (error instanceof UserDenied) {
@@ -227,8 +215,7 @@ export interface Wallet {
    * }, [])
    * ```
    *
-   * @param { ExtensionOptions } tx transaction data
-   * @param terraAddress - does not work at this time. for the future extension
+   * @param { txOptions } tx transaction data
    *
    * @return { Promise<PostResponse> }
    *
@@ -246,18 +233,14 @@ export interface Wallet {
    * @example
    * ```
    * const { sign } = useWallet()
+   * const lcd = useLCDClient()
    *
    * const callback = useCallback(async () => {
    *   try {
-   *    const result: SignResult = await sign({...ExtensionOptions})
+   *    const result: SignResult = await sign({ ...txOptions })
    *
    *    // Broadcast SignResult
    *    const tx = result.result
-   *
-   *    const lcd = new LCDClient({
-   *      chainID: connectedWallet.network.chainID,
-   *      URL: connectedWallet.network.lcd,
-   *    })
    *
    *    const txResult = await lcd.tx.broadcastSync(tx)
    *
@@ -272,8 +255,7 @@ export interface Wallet {
    * }, [])
    * ```
    *
-   * @param { ExtensionOptions } tx transaction data
-   * @param terraAddress - does not work at this time. for the future extension
+   * @param { txOptions } tx transaction data
    *
    * @return { Promise<Tx> }
    *
@@ -318,11 +300,6 @@ function Component() {
 </details>
 
 <details>
-
-  
-  
-  
-  // stop here
 <summary><code>useLCDClient()</code></summary>
 
 ```jsx
@@ -332,71 +309,13 @@ function Component() {
   const lcd = useLCDClient();
 
   const [result, setResult] = useState('');
-
   useEffect(() => {
-    lcd.treasury.taxRate().then((taxRate) => {
-      setResult(taxRate.toString());
+    lcd.tx.estimateFee(signer, txOptions).then((fee) => {
+      setResult(fee.toString());
     });
   }, []);
 
   return <div>Result: {result}</div>;
-}
-```
-
-</details>
-
-# Links
-
-- [Releases (Changelog)](https://github.com/terra-money/wallet-provider/releases)
-
-# Trouble-shooting guide
-
-wallet-provider contains the original source codes in sourcemaps.
-
-<img src="https://raw.githubusercontent.com/terra-money/wallet-provider/main/readme-assets/trouble-shooting-guide.png" width="700" style="max-width: 100%" alt="Trouble-Shooting Guide" />
-
-You can check `src/@terra-money/wallet-provider/` in the Chrome Devtools / Sources Tab, and you can also use breakpoints
-here for debug.
-
-(It may not be visible depending on your development settings such as Webpack.)
-
-# For Chrome Extension compatible wallet developers
-
-<details>
-
-<summary><code>Chrome Extension compatible wallet development guide</code></summary>
-
-### 1. Create dApp for test
-
-There is the `dangerously__chromeExtensionCompatibleBrowserCheck` option to allow you to create a test environment for
-wallet development.
-
-By declaring the `dangerously__chromeExtensionCompatibleBrowserCheck`, you can make your wallet recognized as the chrome
-extension.
-
-```jsx
-<WalletProvider
-  dangerously__chromeExtensionCompatibleBrowserCheck={(userAgent) =>
-    /YourWallet/.test(userAgent)
-  }
->
-  ...
-</WalletProvider>
-```
-
-### 2. Register your wallet as default allow
-
-If your wallet has been developed,
-
-Please send me your wallet App link (Testlight version is OK)
-
-And send me Pull Request by modifying `DEFAULT_CHROME_EXTENSION_COMPATIBLE_BROWSER_CHECK` in
-the `packages/src/@terra-money/wallet-provider/env.ts` file. (or just make an issue is OK)
-
-```diff
-export const DEFAULT_CHROME_EXTENSION_COMPATIBLE_BROWSER_CHECK = (userAgent: string) => {
--  return /MathWallet\//.test(userAgent);
-+  return /MathWallet\//.test(userAgent) || /YourWallet/.test(userAgent);
 }
 ```
 
