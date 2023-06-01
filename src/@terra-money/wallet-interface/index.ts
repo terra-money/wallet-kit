@@ -35,8 +35,8 @@ export interface WalletResponse {
       icon: string;
       website?: string | undefined;
   }[];
-  post: (tx: CreateTxOptions) => Promise<TxResult>;
-  sign: (tx: CreateTxOptions) => Promise<TxResult>;
+  post: (tx: CreateTxOptions) => Promise<PostResponse>;
+  sign: (tx: CreateTxOptions) => Promise<Tx>;
 }
 export type PostResponse = {
   id: number
