@@ -2,7 +2,7 @@ import {
   ConnectResponse,
   EventTypes,
   InfoResponse,
-  Wallet
+  Wallet,
 } from '@terra-money/wallet-interface'
 import createContext from './utils/createContext'
 import React, { useEffect, useState } from 'react'
@@ -35,9 +35,7 @@ type WalletProviderState =
       network: InfoResponse
     }
   | {
-      status:
-        | WalletStatus.INITIALIZING
-        | WalletStatus.NOT_CONNECTED
+      status: WalletStatus.INITIALIZING | WalletStatus.NOT_CONNECTED
       network: InfoResponse
       wallet?: undefined
       connectedWallet?: undefined
@@ -111,13 +109,48 @@ function WalletProvider({
     }
   }, [])
 
+  const { wallet } = state
+
+  useEffect(() => {
+    if (wallet) {
+      const networkCallback = (network: InfoResponse) => {
+        wallet.connect().then((w) =>
+          setState({
+            status: WalletStatus.CONNECTED,
+            wallet,
+            connectedWallet: w,
+            network,
+          }),
+        )
+      }
+      const walletCallback = (connectedWallet: ConnectResponse) => {
+        wallet.info().then((network) =>
+          setState({
+            status: WalletStatus.CONNECTED,
+            wallet,
+            connectedWallet,
+            network,
+          }),
+        )
+      }
+
+      wallet.addListener(EventTypes.NetworkChange, networkCallback)
+      wallet.addListener(EventTypes.WalletChange, walletCallback)
+
+      return () => {
+        wallet.removeListener(EventTypes.NetworkChange, networkCallback)
+        wallet.removeListener(EventTypes.WalletChange, walletCallback)
+      }
+    }
+  }, [wallet])
+
   return (
     <WalletProviderContext
       value={{
         wallets: availableWallets,
         state,
         setState,
-        defaultNetworks
+        defaultNetworks,
       }}
     >
       {children}

@@ -88,11 +88,11 @@ export default class StationWallet implements Wallet {
     })
   }
 
-  private listeners: Record<string, (e: any) => void> = {}
+  private listeners: Record<string, ((e: any) => void)[]> = {}
 
   addListener(event: EventTypes, cb: (data: any) => void) {
     const listener = (e: any) => cb(e.detail)
-    this.listeners[event] = listener
+    this.listeners[event] = [...(this.listeners[event] ?? []), listener]
 
     switch (event) {
       case EventTypes.NetworkChange:
@@ -105,15 +105,19 @@ export default class StationWallet implements Wallet {
   }
 
   removeListener(event: EventTypes, _?: (data: any) => void) {
-    const listener = this.listeners[event]
-    if (!listener) return
+    const listeners = this.listeners[event]
+    if (!listeners) return
 
     switch (event) {
       case EventTypes.NetworkChange:
-        window.removeEventListener('station_network_change', listener)
+        listeners.map((l) =>
+          window.removeEventListener('station_network_change', l),
+        )
         break
       case EventTypes.WalletChange:
-        window.removeEventListener('station_wallet_change', listener)
+        listeners.map((l) =>
+          window.removeEventListener('station_wallet_change', l),
+        )
         break
     }
 
