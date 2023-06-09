@@ -46,6 +46,17 @@ export default class StationWallet implements Wallet {
     })
   }
 
+  async getPubkey() {
+    await this.extension.send('get-pubkey')
+
+    return new Promise<ConnectResponse>((resolve) => {
+      this.pendingRequests['onGetPubkey'] = (data) => {
+        delete data['address']
+        resolve(data)
+      }
+    })
+  }
+
   async post(tx: CreateTxOptions) {
     // is the chain classic?
     const networks = await this.info()

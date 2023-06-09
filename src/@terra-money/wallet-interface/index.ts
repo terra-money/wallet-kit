@@ -21,6 +21,10 @@ export type ConnectResponse = {
   name?: string
   network?: string
   theme?: string
+  pubkey?: {
+    330: string
+    118?: string
+  }
 }
 
 export interface WalletResponse {
@@ -58,6 +62,7 @@ export interface Wallet {
   // methods
   info: () => Promise<InfoResponse>
   connect: () => Promise<ConnectResponse>
+  getPubkey?: () => Promise<ConnectResponse>
   post: (tx: CreateTxOptions) => Promise<PostResponse> 
   sign: (tx: CreateTxOptions) => Promise<Tx>
 
