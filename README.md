@@ -294,10 +294,11 @@ function Component() {
   const isLedger = connected.ledger
   const walletName = connected.name
   const networkName = connected.network // mainnet, testnet, classic, localterra
+  const pubKey = connected.pubkey // returns 118 and 330 standards
   
   return (
   <>
-    <div> name: {walletName} network: {networkName} ledger: {isLedger} </div>
+    <div> name: {walletName} network: {networkName} ledger: {isLedger} pubkeys: {JSON.stringify(pubkey)} </div>
     {Object.keys(connected.addresses).map((chainID) => <p> connected.addresses[chainID] </p>)}
   </>
   )
