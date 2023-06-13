@@ -29,19 +29,141 @@ export type ConnectResponse = {
 
 export interface WalletResponse {
   status: string;
-  network: InfoResponse;
-  connect: (id?: string) => Promise<void>;
-  disconnect: () => void;
-  availableWallets: {
+  /**
+   * current client status
+   *
+   * this will be one of WalletStatus.INITIALIZING | WalletStatus.WALLET_NOT_CONNECTED | WalletStatus.WALLET_CONNECTED
+   *
+   * INITIALIZING = checking that the session and the chrome extension installation. (show the loading to users)
+   * WALLET_NOT_CONNECTED = there is no connected wallet (show the connect and install options to users)
+   * WALLET_CONNECTED = there is aconnected wallet (show the wallet info and disconnect button to users)
+   */
+   network: InfoResponse;
+  /**
+   * LCDCLientConfig information for all chains on the selected network
+   *
+   */
+    availableWallets: {
       id: string;
       isInstalled: boolean | undefined;
       name: string;
       icon: string;
       website?: string | undefined;
-  }[];
-  post: (tx: CreateTxOptions) => Promise<PostResponse>;
-  sign: (tx: CreateTxOptions) => Promise<Tx>;
+    }[];
+  /**
+   * available wallets that can be connected from the browser
+   *
+   */
+  connect: (id?: string) => void;
+  /**
+   * use connect in conjunction with availableWallets to connect the wallet to the web page
+   *
+   * @example
+   * ```
+   * const { availableWallets, connect } = useWallet()
+   *
+   * return (
+   *  <div>
+   *    {
+   *      availableWallets.map(({ id, name, isInstalled }) => (
+   *        <butotn key={id} disabled={!isInstalled} onClick={() => connect(id)}>
+   *          <img src={icon} /> Connect {name}
+   *        </button>
+   *      ))
+   *    }
+   *  </div>
+   * )
+   * ```
+   */
+  disconnect: () => void;
+  /**
+     * disconnect
+     *
+     * @example
+     * ```
+     * const { status, disconnect } = useWallet()
+     *
+     * return status === WalletStatus.WALLET_CONNECTED &&
+     *  <button onClick={() => disconnect()}>
+     *    Disconnect
+     *  </button>
+     * ```
+   */
+    post: (tx: CreateTxOptions) => Promise<PostResponse>;
+  /**
+   * post transaction
+   *
+   * @example
+   * ```
+   * const { post } = useWallet()
+   *
+   * const callback = useCallback(async () => {
+   *   try {
+   *    const result: PostResponse = await post({ ...txOptions })
+   *    // DO SOMETHING...
+   *   } catch (error) {
+   *     if (error instanceof UserDenied) {
+   *       // DO SOMETHING...
+   *     } else {
+   *       // DO SOMETHING...
+   *     }
+   *   }
+   * }, [])
+   * ```
+   *
+   * @param { txOptions } tx transaction data
+   *
+   * @return { Promise<PostResponse> }
+   *
+   * @throws { UserDenied } user denied the tx
+   * @throws { CreateTxFailed } did not create txhash (error dose not broadcasted)
+   * @throws { TxFailed } created txhash (error broadcated)
+   * @throws { Timeout } user does not act anything in specific time
+   * @throws { TxUnspecifiedError } unknown error
+   */
+  
+  sign: (tx: CreateTxOptions) => Promise<Tx>
+  /**
+   * sign transaction
+   *
+   * @example
+   * ```
+   * const { sign } = useWallet()
+   * const lcd = useLCDClient()
+   *
+   * const callback = useCallback(async () => {
+   *   try {
+   *    const result: SignResult = await sign({ ...txOptions })
+   *
+   *    // Broadcast SignResult
+   *    const tx = result.result
+   *
+   *    const txResult = await lcd.tx.broadcastSync(tx)
+   *
+   *    // DO SOMETHING...
+   *   } catch (error) {
+   *     if (error instanceof UserDenied) {
+   *       // DO SOMETHING...
+   *     } else {
+   *       // DO SOMETHING...
+   *     }
+   *   }
+   * }, [])
+   * ```
+   *
+   * @param { CreateTxOptions } tx transaction data
+   *
+   * @return { Promise<Tx> }
+   *
+   * @throws { UserDenied } user denied the tx
+   * @throws { CreateTxFailed } did not create txhash (error dose not broadcasted)
+   * @throws { TxFailed } created txhash (error broadcated)
+   * @throws { Timeout } user does not act anything in specific time
+   * @throws { TxUnspecifiedError } unknown error
+   *
+   */
 }
+
 export type PostResponse = {
   id: number
   origin: string
