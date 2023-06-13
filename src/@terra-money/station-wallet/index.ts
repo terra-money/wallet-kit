@@ -15,15 +15,15 @@ declare global {
 
 export default class StationWallet implements Wallet {
   private extension: Extension
-  private pendingRequests: Record<string, (data: any) => void> = {}
+  private pendingRequests: Record<string, ((data: any) => void)[]> = {}
 
   constructor() {
     this.extension = new Extension()
 
     // @ts-expect-error
     this.extension.on((d, name) => {
-      this.pendingRequests[name]?.(d)
-      delete this.pendingRequests[name]
+      this.pendingRequests[name]?.forEach((cb) => cb(d))
+      this.pendingRequests[name] = []
     })
   }
 
@@ -31,7 +31,10 @@ export default class StationWallet implements Wallet {
     await this.extension.send('interchain-info')
 
     return new Promise<InfoResponse>((resolve) => {
-      this.pendingRequests['onInterchainInfo'] = resolve
+      this.pendingRequests['onInterchainInfo'] = [
+        ...(this.pendingRequests['onInterchainInfo'] ?? []),
+        resolve,
+      ]
     })
   }
 
@@ -39,10 +42,13 @@ export default class StationWallet implements Wallet {
     await this.extension.send('connect')
 
     return new Promise<ConnectResponse>((resolve) => {
-      this.pendingRequests['onConnect'] = (data) => {
-        delete data['address']
-        resolve(data)
-      }
+      this.pendingRequests['onConnect'] = [
+        ...(this.pendingRequests['onConnect'] ?? []),
+        (data) => {
+          delete data['address']
+          resolve(data)
+        },
+      ]
     })
   }
 
@@ -50,10 +56,13 @@ export default class StationWallet implements Wallet {
     await this.extension.send('get-pubkey')
 
     return new Promise<ConnectResponse>((resolve) => {
-      this.pendingRequests['onGetPubkey'] = (data) => {
-        delete data['address']
-        resolve(data)
-      }
+      this.pendingRequests['onGetPubkey'] = [
+        ...(this.pendingRequests['onGetPubkey'] ?? []),
+        (data) => {
+          delete data['address']
+          resolve(data)
+        },
+      ]
     })
   }
 
@@ -74,7 +83,10 @@ export default class StationWallet implements Wallet {
     await this.extension.send('post', data)
 
     return new Promise<PostResponse>((resolve) => {
-      this.pendingRequests['onPost'] = resolve
+      this.pendingRequests['onPost'] = [
+        ...(this.pendingRequests['onPost'] ?? []),
+        resolve,
+      ]
     })
   }
 
@@ -95,7 +107,10 @@ export default class StationWallet implements Wallet {
     await this.extension.send('sign', data)
 
     return new Promise<Tx>((resolve) => {
-      this.pendingRequests['onSign'] = resolve
+      this.pendingRequests['onSign'] = [
+        ...(this.pendingRequests['onSign'] ?? []),
+        resolve,
+      ]
     })
   }
 

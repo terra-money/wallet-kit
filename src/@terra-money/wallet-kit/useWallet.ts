@@ -57,6 +57,8 @@ export function useWallet(): WalletResponse {
       status: WalletStatus.NOT_CONNECTED,
       network: defaultNetworks,
     })
+    
+    window.location.reload()
   }
 
   const post = async (tx: CreateTxOptions) => {
