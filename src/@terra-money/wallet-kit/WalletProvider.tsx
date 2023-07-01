@@ -74,6 +74,11 @@ function WalletProvider({
       })()
 
       const networkCallback = (network: InfoResponse) => {
+        // sometimes the response is empty, if that's the case refresh the page
+        if (Object.keys(network).length === 0) {
+          window.location.reload()
+        }
+
         wallet.connect().then((w) =>
           setState({
             status: WalletStatus.CONNECTED,
