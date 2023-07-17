@@ -122,7 +122,7 @@ export interface WalletResponse {
    * @throws { TxUnspecifiedError } unknown error
    */
   
-  sign: (tx: CreateTxOptions) => Promise<Tx>
+  sign: (tx: CreateTxOptions) => Promise<SignResponse>
   /**
    * sign transaction
    *
@@ -165,11 +165,17 @@ export interface WalletResponse {
 }
 
 export type PostResponse = {
-  id: number
-  origin: string
-  success: boolean
-  result?: TxResult
-  error?: { code: number; message?: string }
+  height: string | number
+  raw_log: string
+  txhash: string
+  code?: number | string
+  codespace?: string
+}
+
+export type SignResponse = {
+  auth_info: Object
+  body: Object
+  signatures: string[]
 }
 
 export enum EventTypes {
@@ -186,7 +192,7 @@ export interface Wallet {
   connect: () => Promise<ConnectResponse>
   getPubkey?: () => Promise<ConnectResponse>
   post: (tx: CreateTxOptions) => Promise<PostResponse> 
-  sign: (tx: CreateTxOptions) => Promise<Tx>
+  sign: (tx: CreateTxOptions) => Promise<SignResponse>
 
   // events
   addListener: (event: EventTypes, cb: (data: any) => void) => void
