@@ -1,3 +1,6 @@
+import StationOfflineSigner from './cosmjsOfflineSigner'
+import KeplrConnector from './keplrConnector'
+
 type NetworkName = 'mainnet' | 'testnet' | 'classic' | 'localterra'
 type ChainID = string
 
@@ -65,6 +68,7 @@ export default class Station {
     string,
     { resolve: (data: any) => void; reject: (data: any) => void }
   > = {}
+  public keplr: KeplrConnector
 
   constructor() {
     const origin = window.location.origin
@@ -83,15 +87,19 @@ export default class Station {
         : this._pendingRequests[reqID].reject(data?.error?.message ?? data)
       delete this._pendingRequests[reqID]
     })
+
+    this.keplr = new KeplrConnector()
   }
 
   private _sendMessage(content: Object, uuid: string) {
     window.postMessage(
-      {
-        ...content,
-        sender: 'web',
-        uuid,
-      },
+      JSON.parse(
+        JSON.stringify({
+          ...content,
+          sender: 'web',
+          uuid,
+        }),
+      ),
       window.location.origin,
     )
   }
@@ -188,5 +196,9 @@ export default class Station {
       )
       this._pendingRequests[reqID] = { resolve, reject }
     })
+  }
+
+  getOfflineSigner(chainID: string): StationOfflineSigner {
+    return new StationOfflineSigner(chainID)
   }
 }
