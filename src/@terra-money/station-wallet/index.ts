@@ -1,72 +1,35 @@
-import {
-  ConnectResponse,
-  EventTypes,
-  InfoResponse,
-  PostResponse,
-  Wallet,
-} from '@terra-money/wallet-interface'
-import { CreateTxOptions, Extension, Tx } from '@terra-money/feather.js'
+import { EventTypes, Wallet } from '@terra-money/wallet-interface'
+import { CreateTxOptions, Tx } from '@terra-money/feather.js'
+import Station from '@terra-money/station-connector'
 
 declare global {
   interface Window {
-    isStationExtensionAvailable: boolean
+    station?: Station
   }
 }
 
 export default class StationWallet implements Wallet {
-  private extension: Extension
-  private pendingRequests: Record<string, ((data: any) => void)[]> = {}
-
-  constructor() {
-    this.extension = new Extension()
-
-    // @ts-expect-error
-    this.extension.on((d, name) => {
-      this.pendingRequests[name]?.forEach((cb) => cb(d))
-      this.pendingRequests[name] = []
-    })
-  }
-
   async info() {
-    await this.extension.send('interchain-info')
+    if (!window.station) throw new Error('Station extension not installed')
 
-    return new Promise<InfoResponse>((resolve) => {
-      this.pendingRequests['onInterchainInfo'] = [
-        ...(this.pendingRequests['onInterchainInfo'] ?? []),
-        resolve,
-      ]
-    })
+    return await window.station.info()
   }
 
   async connect() {
-    await this.extension.send('connect')
+    if (!window.station) throw new Error('Station extension not installed')
 
-    return new Promise<ConnectResponse>((resolve) => {
-      this.pendingRequests['onConnect'] = [
-        ...(this.pendingRequests['onConnect'] ?? []),
-        (data) => {
-          delete data['address']
-          resolve(data)
-        },
-      ]
-    })
+    return await window.station.connect()
   }
 
   async getPubkey() {
-    await this.extension.send('get-pubkey')
+    if (!window.station) throw new Error('Station extension not installed')
 
-    return new Promise<ConnectResponse>((resolve) => {
-      this.pendingRequests['onGetPubkey'] = [
-        ...(this.pendingRequests['onGetPubkey'] ?? []),
-        (data) => {
-          delete data['address']
-          resolve(data)
-        },
-      ]
-    })
+    return await window.station.getPublicKey()
   }
 
   async post(tx: CreateTxOptions) {
+    if (!window.station) throw new Error('Station extension not installed')
+
     // is the chain classic?
     const networks = await this.info()
     const isClassic = !!networks[tx.chainID]?.isClassic
@@ -74,23 +37,17 @@ export default class StationWallet implements Wallet {
     const data = JSON.parse(
       JSON.stringify({
         ...tx,
+        ...(tx.fee ? { fee: JSON.stringify(tx.fee.toData()) } : {}),
         msgs: tx.msgs.map((msg) => JSON.stringify(msg.toData(isClassic))),
-        purgeQueue: true,
-        id: Date.now(),
       }),
     )
 
-    await this.extension.send('post', data)
-
-    return new Promise<PostResponse>((resolve) => {
-      this.pendingRequests['onPost'] = [
-        ...(this.pendingRequests['onPost'] ?? []),
-        resolve,
-      ]
-    })
+    return await window.station.post(data)
   }
 
   async sign(tx: CreateTxOptions) {
+    if (!window.station) throw new Error('Station extension not installed')
+
     // is the chain classic?
     const networks = await this.info()
     const isClassic = !!networks[tx.chainID]?.isClassic
@@ -98,20 +55,12 @@ export default class StationWallet implements Wallet {
     const data = JSON.parse(
       JSON.stringify({
         ...tx,
+        ...(tx.fee ? { fee: JSON.stringify(tx.fee.toData()) } : {}),
         msgs: tx.msgs.map((msg) => JSON.stringify(msg.toData(isClassic))),
-        purgeQueue: true,
-        id: Date.now(),
       }),
     )
 
-    await this.extension.send('sign', data)
-
-    return new Promise<Tx>((resolve) => {
-      this.pendingRequests['onSign'] = [
-        ...(this.pendingRequests['onSign'] ?? []),
-        resolve,
-      ]
-    })
+    return await window.station.sign(data)
   }
 
   private listeners: Record<string, ((e: any) => void)[]> = {}
@@ -150,7 +99,7 @@ export default class StationWallet implements Wallet {
     delete this.listeners[event]
   }
 
-  isInstalled = !!window?.isStationExtensionAvailable
+  isInstalled = !!window?.station
 
   id = 'station-extension'
 
