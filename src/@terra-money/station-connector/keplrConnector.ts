@@ -213,4 +213,14 @@ export default class KeplrConnector {
       },
     )
   }
+
+  async experimentalSuggestChain(chain: ChainInfoResponse) {
+    if (!window.station) throw new Error('Station not available')
+
+    const info = await window.station.info()
+
+    if (!info[chain.chainId]) {
+      throw new Error(`${chain.chainId} is not available on Station.`)
+    }
+  }
 }
