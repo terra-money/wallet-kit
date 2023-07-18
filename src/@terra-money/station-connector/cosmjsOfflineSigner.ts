@@ -73,12 +73,12 @@ export default class StationOfflineSigner implements OfflineAminoSigner {
       : Object.keys(info.gasPrices)[0]
 
     const gas =
-      parseInt(signDocFee.gas) ?? Math.round(200_000 * info.gasAdjustment)
+      parseInt(signDocFee.gas) ?? Math.ceil(200_000 * info.gasAdjustment)
 
     const feeAmount =
       signDocFee.amount.length && Number(signDocFee.amount[0].amount) !== 0
         ? signDocFee.amount[0].amount
-        : (gas * (info.gasPrices[feeDenom] ?? 0)).toString()
+        : Math.ceil(gas * (info.gasPrices[feeDenom] ?? 0)).toString()
 
     const feeFixedAmount = feeAmount + feeDenom
     const fakeMsgs = signDoc.msgs.map((msg) => Msg.fromAmino(msg as Msg.Amino))
