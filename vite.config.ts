@@ -1,15 +1,15 @@
-import reactRefresh from '@vitejs/plugin-react-refresh';
-import * as path from 'path';
-import { defineConfig } from 'vite';
-import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import reactRefresh from '@vitejs/plugin-react-refresh'
+import * as path from 'path'
+import { defineConfig } from 'vite'
+import svgr from 'vite-plugin-svgr'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
       '@terra-money/feather.js': '@terra-money/feather.js/dist/bundle.js',
-      'process': path.resolve(__dirname, 'src/polyfills/process-es6.js'),
+      process: path.resolve(__dirname, 'src/polyfills/process-es6.js'),
       'readable-stream': 'vite-compatible-readable-stream',
     },
   },
@@ -35,4 +35,4 @@ export default defineConfig({
   //    },
   //  },
   //},
-});
+})

@@ -10,6 +10,7 @@ import {
 import ConnectWallet from 'components/ConnectWallet'
 import PostTx from 'components/PostTx'
 import SignTx from 'components/SignTx'
+import TerraStationMobileWallet from '@terra-money/terra-station-mobile'
 
 function App() {
   const { network, status } = useWallet()
@@ -48,7 +49,10 @@ function App() {
 
 getInitialConfig().then((defaultNetworks) =>
   ReactDOM.render(
-    <WalletProvider defaultNetworks={defaultNetworks}>
+    <WalletProvider
+      defaultNetworks={defaultNetworks}
+      extraWallets={[new TerraStationMobileWallet()]}
+    >
       <App />
     </WalletProvider>,
     document.getElementById('root'),

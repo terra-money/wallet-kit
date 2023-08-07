@@ -181,6 +181,7 @@ export type SignResponse = {
 export enum EventTypes {
   NetworkChange = 'networkChange',
   WalletChange = 'walletChange',
+  Disconnect = 'disconnect',
 }
 
 export interface Wallet {
@@ -190,6 +191,7 @@ export interface Wallet {
   // methods
   info: () => Promise<InfoResponse>
   connect: () => Promise<ConnectResponse>
+  disconnect?: () => Promise<void>
   getPubkey?: () => Promise<ConnectResponse>
   post: (tx: CreateTxOptions) => Promise<PostResponse> 
   sign: (tx: CreateTxOptions) => Promise<SignResponse>
