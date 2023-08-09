@@ -103,7 +103,6 @@ function WalletProvider({
       wallet.addListener(EventTypes.WalletChange, walletCallback)
 
       const disconnectCallback = () => {
-        console.log("disconnectCallback")
         localStorage.removeItem('__wallet_kit_connected_wallet')
 
         setState({
@@ -151,7 +150,6 @@ function WalletProvider({
         )
       }
       const disconnectCallback = () => {
-        console.log("disconnectCallback")
         localStorage.removeItem('__wallet_kit_connected_wallet')
 
         setState({

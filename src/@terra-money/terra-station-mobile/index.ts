@@ -78,7 +78,6 @@ export default class TerraStationMobileWallet implements Wallet {
     })
 
     this._connector.on('disconnect', (error, payload) => {
-      console.log('disconnect', error, payload)
       if (error) throw error
       this.disconnect()
     })
@@ -157,6 +156,12 @@ export default class TerraStationMobileWallet implements Wallet {
 
       this._address = draftConnector.accounts[0]
       this._chainID = chainIDs[Number(draftConnector.chainId)]
+
+      return {
+        addresses: {
+          [this._chainID]: this._address,
+        },
+      }
     } else {
       const clientId = uuid()
       const draftConnector = new Connector({
@@ -210,7 +215,6 @@ export default class TerraStationMobileWallet implements Wallet {
   }
 
   async disconnect() {
-    console.log("disconnecting...")
     if (this._connector && this._connector.connected) {
       try {
         this._connector.killSession()
@@ -221,7 +225,6 @@ export default class TerraStationMobileWallet implements Wallet {
     this._address = null
     this._chainID = null
 
-    console.log("triggering disconnect event...")
     this._triggerListener(EventTypes.Disconnect, null)
   }
 
@@ -307,7 +310,6 @@ export default class TerraStationMobileWallet implements Wallet {
   private _listeners: Record<string, ((e: any) => void)[]> = {}
 
   addListener(event: EventTypes, cb: (data: any) => void) {
-    console.log("added listener for " + event)
     this._listeners[event] = [...(this._listeners[event] ?? []), cb]
   }
 
@@ -316,7 +318,6 @@ export default class TerraStationMobileWallet implements Wallet {
   }
 
   private _triggerListener(event: EventTypes, data: any) {
-    console.log("triggered listener for " + event)
     this._listeners[event]?.forEach((cb) => cb(data))
   }
 
@@ -325,8 +326,8 @@ export default class TerraStationMobileWallet implements Wallet {
   id = 'terra-station-mobile'
 
   details = {
-    name: 'Terra Station Mobile',
-    icon: 'https://station-assets.terra.money/img/station.png',
+    name: 'Terra Station (Mobile)',
+    icon: 'https://station-assets.terra.money/img/walletconnect.svg',
     website: 'https://setup-station.terra.money/',
   }
 }
