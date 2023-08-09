@@ -1,7 +1,4 @@
 import {
-  ConnectResponse,
-  EventTypes,
-  InfoResponse,
   WalletResponse,
 } from '@terra-money/wallet-interface'
 import {  useWalletProvider, WalletStatus } from './WalletProvider'
@@ -52,6 +49,7 @@ export function useWallet(): WalletResponse {
 
   const disconnect = () => {
     localStorage.removeItem('__wallet_kit_connected_wallet')
+    wallet?.disconnect?.()
 
     setState({
       status: WalletStatus.NOT_CONNECTED,
