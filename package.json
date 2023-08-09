@@ -1,11 +1,12 @@
 {
   "name": "wallet-kit",
-  "version": "1.0.5",
+  "version": "1.0.6-beta.1",
   "description": "new version of wallet-provider",
   "main": "index.js",
   "scripts": {
     "start": "vite --open --port=9220 --host",
-    "build": "TS_NODE_PROJECT=tsconfig.script.json node -r ts-node/register -r tsconfig-paths/register scripts/build.ts"
+    "build": "TS_NODE_PROJECT=tsconfig.script.json node -r ts-node/register -r tsconfig-paths/register scripts/build.ts",
+    "publish": "rocket-punch publish"
   },
   "author": "",
   "license": "ISC",

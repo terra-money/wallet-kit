@@ -103,6 +103,7 @@ function WalletProvider({
       wallet.addListener(EventTypes.WalletChange, walletCallback)
 
       const disconnectCallback = () => {
+        console.log("disconnectCallback")
         localStorage.removeItem('__wallet_kit_connected_wallet')
 
         setState({
@@ -149,13 +150,24 @@ function WalletProvider({
           }),
         )
       }
+      const disconnectCallback = () => {
+        console.log("disconnectCallback")
+        localStorage.removeItem('__wallet_kit_connected_wallet')
+
+        setState({
+          status: WalletStatus.NOT_CONNECTED,
+          network: defaultNetworks,
+        })
+      }
 
       wallet.addListener(EventTypes.NetworkChange, networkCallback)
       wallet.addListener(EventTypes.WalletChange, walletCallback)
+      wallet.addListener(EventTypes.Disconnect, disconnectCallback)
 
       return () => {
         wallet.removeListener(EventTypes.NetworkChange, networkCallback)
         wallet.removeListener(EventTypes.WalletChange, walletCallback)
+        wallet.removeListener(EventTypes.Disconnect, disconnectCallback)
       }
     }
   }, [wallet])

@@ -20,8 +20,8 @@ const chainIDs = ['pisco-1', 'phoenix-1', 'columbus-5']
 export default class TerraStationMobileWallet implements Wallet {
   private _address: string | null = null
   private _chainID: string | null = null
-  private _connector: Connector
-  private _qrcodeModal: TerraWalletconnectQrcodeModal
+  private _connector: Connector | null = null
+  private _qrcodeModal: TerraWalletconnectQrcodeModal | null = null
   private _networksList: Record<string, LCDClientConfig> | null = null
   private _eventListeners: Record<
     WalletConnectEvents,
@@ -32,7 +32,96 @@ export default class TerraStationMobileWallet implements Wallet {
     connect: [],
   }
 
-  constructor() {
+  constructor() {}
+
+  private _initEvents() {
+    if (!this._connector) {
+      throw new Error(`WalletConnect is not defined!`)
+    }
+
+    this._connector.on('connect', (error, payload) => {
+      if (error) throw error
+
+      this._address = payload.params[0].accounts[0]
+      this._chainID = chainIDs[Number(payload.params[0].chainId)]
+
+      this._eventListeners.connect.forEach((listener) => {
+        listener(error, payload)
+      })
+
+      this._eventListeners.connect = []
+    })
+
+    this._connector.on('session_update', async (error, payload) => {
+      if (error) throw error
+
+      const newAddress = payload.params[0].accounts[0]
+      const newChainID = chainIDs[Number(payload.params[0].chainId)]
+
+      if (newAddress !== this._address) {
+        this._address = newAddress
+        this._triggerListener(EventTypes.WalletChange, {
+          addresses: {
+            [newChainID]: newAddress,
+          },
+        })
+      }
+      if (newChainID !== this._chainID) {
+        this._chainID = newChainID
+
+        this._fetchNetworksList().then((networks) => {
+          this._triggerListener(EventTypes.NetworkChange, {
+            [newChainID]: networks[newChainID],
+          })
+        })
+      }
+    })
+
+    this._connector.on('disconnect', (error, payload) => {
+      console.log('disconnect', error, payload)
+      if (error) throw error
+      this.disconnect()
+    })
+  }
+
+  private async _fetchNetworksList() {
+    if (this._networksList) return this._networksList
+
+    const { data } = await axios.get(
+      'https://station-assets.terra.money/chains.json',
+    )
+    const result = Object.fromEntries(
+      Object.entries({
+        ...data.mainnet,
+        ...data.testnet,
+        ...data.classic,
+      } as Record<string, LCDClientConfig>).filter(
+        ([, { prefix }]) => prefix === 'terra',
+      ),
+    )
+
+    this._networksList = result
+    return result
+  }
+
+  async info() {
+    const networks = await this._fetchNetworksList()
+    const chainID = this._chainID || 'phoenix-1'
+
+    return {
+      [chainID]: networks[chainID],
+    }
+  }
+
+  async connect() {
+    if (this._address && this._chainID) {
+      return {
+        addresses: {
+          [this._chainID]: this._address,
+        },
+      }
+    }
+
     this._qrcodeModal = new TerraWalletconnectQrcodeModal()
 
     const connectorOpts: IWalletConnectOptions = {
@@ -85,94 +174,6 @@ export default class TerraStationMobileWallet implements Wallet {
 
       this._connector = draftConnector
     }
-  }
-
-  private _initEvents() {
-    if (!this._connector) {
-      throw new Error(`WalletConnect is not defined!`)
-    }
-
-    this._connector.on('connect', (error, payload) => {
-      if (error) throw error
-
-      this._address = payload.params[0].accounts[0]
-      this._chainID = chainIDs[Number(payload.params[0].chainId)]
-
-      this._eventListeners.connect.forEach((listener) => {
-        listener(error, payload)
-      })
-
-      this._eventListeners.connect = []
-    })
-
-    this._connector.on('session_update', async (error, payload) => {
-      if (error) throw error
-
-      const newAddress = payload.params[0].accounts[0]
-      const newChainID = chainIDs[Number(payload.params[0].chainId)]
-
-      if (newAddress !== this._address) {
-        this._address = newAddress
-        this._triggerListener(EventTypes.WalletChange, {
-          addresses: {
-            [newChainID]: newAddress,
-          },
-        })
-      }
-      if (newChainID !== this._chainID) {
-        this._chainID = newChainID
-
-        this._fetchNetworksList().then((networks) => {
-          this._triggerListener(EventTypes.NetworkChange, {
-            [newChainID]: networks[newChainID],
-          })
-        })
-      }
-    })
-
-    this._connector.on('disconnect', (error, payload) => {
-      if (error) throw error
-      this.disconnect()
-    })
-  }
-
-  private async _fetchNetworksList() {
-    if (this._networksList) return this._networksList
-
-    const { data } = await axios.get(
-      'https://station-assets.terra.money/chains.json',
-    )
-    const result = Object.fromEntries(
-      Object.entries({
-        ...data.mainnet,
-        ...data.testnet,
-        ...data.classic,
-      } as Record<string, LCDClientConfig>).filter(
-        ([, { prefix }]) => prefix === 'terra',
-      ),
-    )
-
-    this._networksList = result
-    return result
-  }
-
-  async info() {
-    const networks = await this._fetchNetworksList()
-    const chainID = this._chainID || 'phoenix-1'
-
-    return {
-      [chainID]: networks[chainID],
-    }
-  }
-
-  async connect() {
-    if (this._address && this._chainID) {
-      return {
-        addresses: {
-          [this._chainID]: this._address,
-        },
-      }
-    }
 
     if (!this._connector.connected) {
       this._connector.createSession().catch(console.error)
@@ -209,6 +210,7 @@ export default class TerraStationMobileWallet implements Wallet {
   }
 
   async disconnect() {
+    console.log("disconnecting...")
     if (this._connector && this._connector.connected) {
       try {
         this._connector.killSession()
@@ -219,6 +221,7 @@ export default class TerraStationMobileWallet implements Wallet {
     this._address = null
     this._chainID = null
 
+    console.log("triggering disconnect event...")
     this._triggerListener(EventTypes.Disconnect, null)
   }
 
@@ -304,6 +307,7 @@ export default class TerraStationMobileWallet implements Wallet {
   private _listeners: Record<string, ((e: any) => void)[]> = {}
 
   addListener(event: EventTypes, cb: (data: any) => void) {
+    console.log("added listener for " + event)
     this._listeners[event] = [...(this._listeners[event] ?? []), cb]
   }
 
@@ -312,6 +316,7 @@ export default class TerraStationMobileWallet implements Wallet {
   }
 
   private _triggerListener(event: EventTypes, data: any) {
+    console.log("triggered listener for " + event)
     this._listeners[event]?.forEach((cb) => cb(data))
   }
 
