@@ -65,25 +65,28 @@ export default class StationOfflineSigner implements OfflineAminoSigner {
       )
 
     const signDocFee = signDoc.fee
+
+    const feeDenom = signDocFee.amount.length
+      ? signDocFee.amount[0].denom
+      : typeof info.gasPrices[info.baseAsset] === 'number'
+      ? info.baseAsset
+      : Object.keys(info.gasPrices)[0]
+
+    const gas =
+      parseInt(signDocFee.gas) ?? Math.ceil(200_000 * info.gasAdjustment)
+
     const feeAmount =
-      Number(signDocFee.amount[0].amount) !== 0
+      signDocFee.amount.length && Number(signDocFee.amount[0].amount) !== 0
         ? signDocFee.amount[0].amount
-        : (
-            parseInt(signDocFee.gas) *
-            (info.gasPrices[signDocFee.amount[0].denom] ?? 0)
-          ).toString()
-    const feeFixedAmount = feeAmount + signDocFee.amount[0].denom
+        : Math.ceil(gas * (info.gasPrices[feeDenom] ?? 0)).toString()
+
+    const feeFixedAmount = feeAmount + feeDenom
     const fakeMsgs = signDoc.msgs.map((msg) => Msg.fromAmino(msg as Msg.Amino))
 
     const signResponse = await window.station.sign({
       chainID: signDoc.chain_id,
       msgs: fakeMsgs,
-      fee: new Fee(
-        parseInt(signDocFee.gas),
-        feeFixedAmount,
-        signDocFee.payer,
-        signDocFee.granter,
-      ),
+      fee: new Fee(gas, feeFixedAmount, signDocFee.payer, signDocFee.granter),
       memo: signDoc.memo,
       signMode: SignatureV2.SignMode.SIGN_MODE_LEGACY_AMINO_JSON,
     } as any)
@@ -99,7 +102,7 @@ export default class StationOfflineSigner implements OfflineAminoSigner {
         ...signDoc,
         fee: {
           ...signDocFee,
-          amount: [{ ...signDocFee.amount[0], amount: feeAmount }],
+          amount: [{ denom: feeDenom, amount: feeAmount }],
         },
       },
       signature,
