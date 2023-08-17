@@ -116,6 +116,8 @@ export default class StationWallet implements Wallet {
 
   // helpers
   private async _waitWindowLoad() {
+    if (document.readyState === "complete") return
+    
     return new Promise((resolve) => {
       const documentStateChange = (event: Event) => {
         if (
