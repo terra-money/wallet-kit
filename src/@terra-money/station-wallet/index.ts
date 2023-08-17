@@ -10,24 +10,28 @@ declare global {
 
 export default class StationWallet implements Wallet {
   async info() {
+    await this._waitWindowLoad()
     if (!window.station) throw new Error('Station extension not installed')
 
     return await window.station.info()
   }
 
   async connect() {
+    await this._waitWindowLoad()
     if (!window.station) throw new Error('Station extension not installed')
 
     return await window.station.connect()
   }
 
   async getPubkey() {
+    await this._waitWindowLoad()
     if (!window.station) throw new Error('Station extension not installed')
 
     return await window.station.getPublicKey()
   }
 
   async post(tx: CreateTxOptions) {
+    await this._waitWindowLoad()
     if (!window.station) throw new Error('Station extension not installed')
 
     // is the chain classic?
@@ -46,6 +50,7 @@ export default class StationWallet implements Wallet {
   }
 
   async sign(tx: CreateTxOptions) {
+    await this._waitWindowLoad()
     if (!window.station) throw new Error('Station extension not installed')
 
     // is the chain classic?
@@ -107,5 +112,22 @@ export default class StationWallet implements Wallet {
     name: 'Station (Extension)',
     icon: 'https://station-assets.terra.money/img/station.png',
     website: 'https://setup-station.terra.money/',
+  }
+
+  // helpers
+  private async _waitWindowLoad() {
+    return new Promise((resolve) => {
+      const documentStateChange = (event: Event) => {
+        if (
+          event.target &&
+          (event.target as Document).readyState === 'complete'
+        ) {
+          resolve(undefined)
+          document.removeEventListener('readystatechange', documentStateChange)
+        }
+      }
+
+      document.addEventListener('readystatechange', documentStateChange)
+    })
   }
 }
