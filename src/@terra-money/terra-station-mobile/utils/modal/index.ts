@@ -1,7 +1,7 @@
-import { IQRCodeModal, IQRCodeModalOptions } from '@walletconnect/types';
-import { toCanvas } from 'qrcode';
-import { isMobile as isMobileBrowser } from '../browser-check';
-import { modalStyle } from './style';
+import { IQRCodeModal, IQRCodeModalOptions } from "@walletconnect/types";
+import { toCanvas } from "qrcode";
+import { isMobile as isMobileBrowser } from "../browser-check";
+import { modalStyle } from "./style";
 
 export class TerraWalletconnectQrcodeModal implements IQRCodeModal {
   modalContainer: HTMLDivElement | null = null;
@@ -16,13 +16,13 @@ export class TerraWalletconnectQrcodeModal implements IQRCodeModal {
   open = (
     uri: string,
     cb: () => void,
-    _qrcodeModalOptions?: IQRCodeModalOptions,
+    _qrcodeModalOptions?: IQRCodeModalOptions
   ) => {
-    const modalContainer = document.createElement('div');
-    const stylecontainer = document.createElement('style');
+    const modalContainer = document.createElement("div");
+    const stylecontainer = document.createElement("style");
 
     const query = encodeURIComponent(
-      `action=wallet_connect&payload=${encodeURIComponent(uri)}`,
+      `action=wallet_connect&payload=${encodeURIComponent(uri)}`
     );
 
     const schemeUri = `https://terrastation.page.link/?link=https://terra.money?${query}&apn=money.terra.station&ibi=money.terra.station&isi=1548434735`;
@@ -45,8 +45,8 @@ export class TerraWalletconnectQrcodeModal implements IQRCodeModal {
     stylecontainer.textContent = modalStyle;
     modalContainer.appendChild(element);
 
-    document.querySelector('head')?.appendChild(stylecontainer);
-    document.querySelector('body')?.appendChild(modalContainer);
+    document.querySelector("head")?.appendChild(stylecontainer);
+    document.querySelector("body")?.appendChild(modalContainer);
 
     this.modalContainer = modalContainer;
     this.styleContainer = stylecontainer;
@@ -81,67 +81,67 @@ function createModalElement({
   // ---------------------------------------------
   // container
   // ---------------------------------------------
-  const container = document.createElement('div');
-  container.setAttribute('class', 'wallet-wc-modal');
+  const container = document.createElement("div");
+  container.setAttribute("class", "wallet-wc-modal");
 
   // ---------------------------------------------
   // container > div.wallet-wc-modal--dim
   // ---------------------------------------------
-  const dim = document.createElement('div');
-  dim.setAttribute('class', 'wallet-wc-modal--dim');
+  const dim = document.createElement("div");
+  dim.setAttribute("class", "wallet-wc-modal--dim");
 
   container.appendChild(dim);
 
   // ---------------------------------------------
   // container > div.wallet-wc-modal--content
   // ---------------------------------------------
-  const content = document.createElement('section');
-  content.setAttribute('class', 'wallet-wc-modal--content');
-  content.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const content = document.createElement("section");
+  content.setAttribute("class", "wallet-wc-modal--content");
+  content.setAttribute("data-device", isMobile ? "mobile" : "desktop");
 
   container.appendChild(content);
 
   // h1
-  const title = document.createElement('h1');
+  const title = document.createElement("h1");
   content.appendChild(title);
 
-  const img = document.createElement('img');
+  const img = document.createElement("img");
   img.setAttribute(
-    'src',
-    'https://assets.terra.money/icon/wallet-provider/walletconnect.svg',
+    "src",
+    "https://assets.terra.dev/icon/wallet-provider/walletconnect.svg"
   );
   img.setAttribute(
-    'style',
-    'width: 1em; margin-right: 10px; transform: scale(1.5) translateY(0.08em)',
+    "style",
+    "width: 1em; margin-right: 10px; transform: scale(1.5) translateY(0.08em)"
   );
 
-  const span = document.createElement('span');
-  span.textContent = 'Wallet Connect';
+  const span = document.createElement("span");
+  span.textContent = "Wallet Connect";
 
   title.appendChild(img);
   title.appendChild(span);
 
   // p
-  const description = document.createElement('p');
+  const description = document.createElement("p");
   description.textContent =
-    'Scan QR code with a WalletConnect-compatible wallet';
+    "Scan QR code with a WalletConnect-compatible wallet";
   content.appendChild(description);
 
   if (isMobile) {
     // button
-    const button = document.createElement('button');
-    button.addEventListener('click', openTerraStationMobile);
-    button.textContent = 'Open Terra Station Mobile';
+    const button = document.createElement("button");
+    button.addEventListener("click", openTerraStationMobile);
+    button.textContent = "Open Terra Station Mobile";
 
     content.appendChild(button);
   } else {
     // qrcode
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     toCanvas(canvas, schemeUri, {
       width: 220,
       margin: 0,
       color: {
-        dark: '#2043b5ff',
+        dark: "#2043b5ff",
       },
     });
 
@@ -149,7 +149,7 @@ function createModalElement({
   }
 
   // events
-  dim.addEventListener('click', onClose);
+  dim.addEventListener("click", onClose);
 
   return container;
 }
