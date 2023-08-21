@@ -1,7 +1,7 @@
-import { AminoSignResponse, StdSignDoc, coin, coins } from '@cosmjs/amino'
-import StationOfflineSigner from './cosmjsOfflineSigner'
-import { bech32 } from 'bech32'
-import axios from 'axios'
+import { AminoSignResponse, StdSignDoc, coin, coins } from "@cosmjs/amino"
+import StationOfflineSigner from "./cosmjsOfflineSigner"
+import { bech32 } from "bech32"
+import axios from "axios"
 
 export type GetKeyResponse = {
   // Name of the selected key store.
@@ -60,8 +60,8 @@ export type ChainInfoResponse = {
 }
 
 export default class KeplrConnector {
-  readonly version = '0.12.16'
-  readonly mode = 'extension'
+  readonly version = "0.12.16"
+  readonly mode = "extension"
 
   getOfflineSigner(chainID: string): StationOfflineSigner {
     return new StationOfflineSigner(chainID)
@@ -76,7 +76,7 @@ export default class KeplrConnector {
   }
 
   async enable(chainID: string | string[]): Promise<void> {
-    if (!window.station) throw new Error('Station not available')
+    if (!window.station) throw new Error("Station not available")
 
     await window.station.connect()
   }
@@ -84,11 +84,11 @@ export default class KeplrConnector {
   async disable(chainID?: string | string[]): Promise<void> {}
 
   async getKey(chainID: string): Promise<GetKeyResponse> {
-    if (!window.station) throw new Error('Station not available')
+    if (!window.station) throw new Error("Station not available")
 
     const info = (await window.station.info())[chainID]
     if (!info)
-      throw new Error('The requested chain is not available on Station.')
+      throw new Error("The requested chain is not available on Station.")
 
     const connectedWallet = await window.station.connect()
 
@@ -98,10 +98,10 @@ export default class KeplrConnector {
 
     return {
       name: connectedWallet.name,
-      algo: 'secp256k1',
-      pubKey: Buffer.from(pubkey, 'base64'),
+      algo: "secp256k1",
+      pubKey: Buffer.from(pubkey, "base64"),
       address: Buffer.from(
-        bech32.decode(connectedWallet.addresses[chainID]).words,
+        bech32.decode(connectedWallet.addresses[chainID]).words
       ),
       bech32Address: connectedWallet.addresses[chainID],
       // since protobuf is not supported by Station, we set this as true
@@ -112,22 +112,22 @@ export default class KeplrConnector {
   async signAmino(
     chainID: string,
     signer: string,
-    signDoc: StdSignDoc,
+    signDoc: StdSignDoc
   ): Promise<AminoSignResponse> {
     const offlineSigner = this.getOfflineSigner(chainID)
     return offlineSigner.signAmino(signer, signDoc)
   }
 
   async signDirect(...args: any): Promise<any> {
-    throw new Error('signDirect not supported by Station')
+    throw new Error("signDirect not supported by Station")
   }
 
   async getChainInfosWithoutEndpoints(): Promise<ChainInfoResponse[]> {
-    if (!window.station) throw new Error('Station not available')
+    if (!window.station) throw new Error("Station not available")
 
     const info = await window.station.info()
     const { data: coinsData } = await axios.get(
-      'https://station-assets.terra.money/denoms.json',
+      "https://station-assets.terra.dev/denoms.json"
     )
 
     const coins = Object.values({
@@ -148,17 +148,17 @@ export default class KeplrConnector {
       ({ chainID, name, icon, coinType, baseAsset, prefix }) => {
         const stakeCurrency = coins.find(
           ({ token, chainID: tokenChain }) =>
-            token === baseAsset && tokenChain === chainID,
+            token === baseAsset && tokenChain === chainID
         )
         const currencies = coins.filter(
-          ({ chainID: tokenChain }) => tokenChain === chainID,
+          ({ chainID: tokenChain }) => tokenChain === chainID
         )
         const feeCurrencies = Object.keys(info[chainID].gasPrices).map(
           (denom) =>
             coins.find(
               ({ token, chainID: tokenChain }) =>
-                token === denom && tokenChain === chainID,
-            ),
+                token === denom && tokenChain === chainID
+            )
         )
 
         return {
@@ -173,7 +173,7 @@ export default class KeplrConnector {
           stakeCurrency: {
             coinDecimals: stakeCurrency?.decimals ?? 6,
             coinDenom: baseAsset,
-            coinImageUrl: stakeCurrency?.icon ?? '',
+            coinImageUrl: stakeCurrency?.icon ?? "",
             coinMinimalDenom: stakeCurrency?.symbol ?? baseAsset,
           },
 
@@ -207,15 +207,15 @@ export default class KeplrConnector {
                   high: info[chainID].gasPrices[token],
                   low: info[chainID].gasPrices[token],
                 },
-              }),
+              })
             ),
         }
-      },
+      }
     )
   }
 
   async experimentalSuggestChain(chain: ChainInfoResponse) {
-    if (!window.station) throw new Error('Station not available')
+    if (!window.station) throw new Error("Station not available")
 
     const info = await window.station.info()
 

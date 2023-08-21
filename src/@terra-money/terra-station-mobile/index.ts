@@ -1,21 +1,21 @@
-import Connector from '@walletconnect/core'
-import * as cryptoLib from '@walletconnect/iso-crypto'
-import { IPushServerOptions, IWalletConnectOptions } from '@walletconnect/types'
-import { uuid } from '@walletconnect/utils'
-import SocketTransport from './utils/socket-transport'
+import Connector from "@walletconnect/core"
+import * as cryptoLib from "@walletconnect/iso-crypto"
+import { IPushServerOptions, IWalletConnectOptions } from "@walletconnect/types"
+import { uuid } from "@walletconnect/utils"
+import SocketTransport from "./utils/socket-transport"
 import {
   ConnectResponse,
   EventTypes,
   Wallet,
-} from '@terra-money/wallet-interface'
-import { TerraWalletconnectQrcodeModal } from './utils/modal'
-import { CreateTxOptions, LCDClientConfig } from '@terra-money/feather.js'
-import axios from 'axios'
-import { isMobile } from './utils/browser-check'
+} from "@terra-money/wallet-interface"
+import { TerraWalletconnectQrcodeModal } from "./utils/modal"
+import { CreateTxOptions, LCDClientConfig } from "@terra-money/feather.js"
+import axios from "axios"
+import { isMobile } from "./utils/browser-check"
 
-type WalletConnectEvents = 'session_update' | 'disconnect' | 'connect'
+type WalletConnectEvents = "session_update" | "disconnect" | "connect"
 
-const chainIDs = ['pisco-1', 'phoenix-1', 'columbus-5']
+const chainIDs = ["pisco-1", "phoenix-1", "columbus-5"]
 
 export default class TerraStationMobileWallet implements Wallet {
   private _address: string | null = null
@@ -39,7 +39,7 @@ export default class TerraStationMobileWallet implements Wallet {
       throw new Error(`WalletConnect is not defined!`)
     }
 
-    this._connector.on('connect', (error, payload) => {
+    this._connector.on("connect", (error, payload) => {
       if (error) throw error
 
       this._address = payload.params[0].accounts[0]
@@ -52,7 +52,7 @@ export default class TerraStationMobileWallet implements Wallet {
       this._eventListeners.connect = []
     })
 
-    this._connector.on('session_update', async (error, payload) => {
+    this._connector.on("session_update", async (error, payload) => {
       if (error) throw error
 
       const newAddress = payload.params[0].accounts[0]
@@ -77,7 +77,7 @@ export default class TerraStationMobileWallet implements Wallet {
       }
     })
 
-    this._connector.on('disconnect', (error, payload) => {
+    this._connector.on("disconnect", (error, payload) => {
       if (error) throw error
       this.disconnect()
     })
@@ -87,7 +87,7 @@ export default class TerraStationMobileWallet implements Wallet {
     if (this._networksList) return this._networksList
 
     const { data } = await axios.get(
-      'https://station-assets.terra.money/chains.json',
+      "https://station-assets.terra.dev/chains.json"
     )
     const result = Object.fromEntries(
       Object.entries({
@@ -95,8 +95,8 @@ export default class TerraStationMobileWallet implements Wallet {
         ...data.testnet,
         ...data.classic,
       } as Record<string, LCDClientConfig>).filter(
-        ([, { prefix }]) => prefix === 'terra',
-      ),
+        ([, { prefix }]) => prefix === "terra"
+      )
     )
 
     this._networksList = result
@@ -105,7 +105,7 @@ export default class TerraStationMobileWallet implements Wallet {
 
   async info() {
     const networks = await this._fetchNetworksList()
-    const chainID = this._chainID || 'phoenix-1'
+    const chainID = this._chainID || "phoenix-1"
 
     return {
       [chainID]: networks[chainID],
@@ -124,14 +124,14 @@ export default class TerraStationMobileWallet implements Wallet {
     this._qrcodeModal = new TerraWalletconnectQrcodeModal()
 
     const connectorOpts: IWalletConnectOptions = {
-      bridge: 'https://walletconnect.terra.dev/',
+      bridge: "https://walletconnect.terra.dev/",
       qrcodeModal: this._qrcodeModal,
     }
 
     const pushServerOpts: IPushServerOptions | undefined = undefined //options.pushServerOpts;
 
-    const cachedSession = localStorage.getItem('walletconnect')
-    if (typeof cachedSession === 'string') {
+    const cachedSession = localStorage.getItem("walletconnect")
+    if (typeof cachedSession === "string") {
       const cachedSessionObject = JSON.parse(cachedSession)
       const clientId = cachedSessionObject.clientId
       const draftConnector = new Connector({
@@ -142,7 +142,7 @@ export default class TerraStationMobileWallet implements Wallet {
         pushServerOpts,
         cryptoLib,
         transport: new SocketTransport({
-          protocol: 'wc',
+          protocol: "wc",
           version: 1,
           url: connectorOpts.bridge!,
           subscriptions: [clientId],
@@ -169,7 +169,7 @@ export default class TerraStationMobileWallet implements Wallet {
         pushServerOpts,
         cryptoLib,
         transport: new SocketTransport({
-          protocol: 'wc',
+          protocol: "wc",
           version: 1,
           url: connectorOpts.bridge!,
           subscriptions: [clientId],
@@ -220,7 +220,7 @@ export default class TerraStationMobileWallet implements Wallet {
         this._connector.killSession()
       } catch (e) {}
     }
-    localStorage.removeItem('walletconnect')
+    localStorage.removeItem("walletconnect")
 
     this._address = null
     this._chainID = null
@@ -236,8 +236,8 @@ export default class TerraStationMobileWallet implements Wallet {
     const id = Date.now()
 
     const serializedTxOptions = {
-      msgs: tx.msgs.map((msg) => msg.toJSON(tx.chainID === 'columbus-5')),
-      fee: tx.fee?.toJSON(tx.chainID === 'columbus-5'),
+      msgs: tx.msgs.map((msg) => msg.toJSON(tx.chainID === "columbus-5")),
+      fee: tx.fee?.toJSON(tx.chainID === "columbus-5"),
       memo: tx.memo,
       gas: tx.gas,
       gasPrices: tx.gasPrices?.toString(),
@@ -252,13 +252,13 @@ export default class TerraStationMobileWallet implements Wallet {
       const payload = JSON.stringify({
         id,
         handshakeTopic: this._connector.handshakeTopic,
-        method: 'post',
+        method: "post",
         params: serializedTxOptions,
       })
       // FIXME changed walletconnect confirm schema
       window.location.href = `terrastation://walletconnect_confirm/?action=walletconnect_confirm&payload=${Buffer.from(
-        payload,
-      ).toString('base64')}`
+        payload
+      ).toString("base64")}`
       //window.location.href = `terrastation://wallet_connect_confirm?id=${id}&handshakeTopic=${
       //  connector.handshakeTopic
       //}&params=${JSON.stringify([serializedTxOptions])}`;
@@ -267,7 +267,7 @@ export default class TerraStationMobileWallet implements Wallet {
     return this._connector
       .sendCustomRequest({
         id,
-        method: 'post',
+        method: "post",
         params: [serializedTxOptions],
       })
       .catch((error) => {
@@ -277,23 +277,23 @@ export default class TerraStationMobileWallet implements Wallet {
           const { code, message } = JSON.parse(error.message)
           switch (code) {
             case 1:
-              throwError = new Error('User denied')
+              throwError = new Error("User denied")
               break
             case 2:
-              throwError = new Error('Create tx failed: ' + message)
+              throwError = new Error("Create tx failed: " + message)
               break
             case 3:
-              throwError = new Error('Tx failed: ' + message)
+              throwError = new Error("Tx failed: " + message)
               break
             case 4:
-              throwError = new Error('WalletConnect timeout: ' + message)
+              throwError = new Error("WalletConnect timeout: " + message)
               break
             case 99:
-              throwError = new Error('WalletConnect error: ' + message)
+              throwError = new Error("WalletConnect error: " + message)
               break
           }
         } catch {
-          throwError = new Error('WalletConnect error: ' + error.message)
+          throwError = new Error("WalletConnect error: " + error.message)
         }
 
         throw throwError
@@ -323,11 +323,11 @@ export default class TerraStationMobileWallet implements Wallet {
 
   isInstalled = true
 
-  id = 'terra-station-mobile'
+  id = "terra-station-mobile"
 
   details = {
-    name: 'Terra Station (Mobile)',
-    icon: 'https://station-assets.terra.money/img/walletconnect.svg',
-    website: 'https://setup-station.terra.money/',
+    name: "Terra Station (Mobile)",
+    icon: "https://station-assets.terra.dev/img/walletconnect.svg",
+    website: "https://setup.station.money/",
   }
 }
