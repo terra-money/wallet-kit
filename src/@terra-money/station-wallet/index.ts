@@ -1,6 +1,6 @@
-import { EventTypes, Wallet } from "@terra-money/wallet-interface"
-import { CreateTxOptions, Tx } from "@terra-money/feather.js"
-import Station from "@terra-money/station-connector"
+import { EventTypes, Wallet } from '@terra-money/wallet-interface'
+import { CreateTxOptions, Tx } from '@terra-money/feather.js'
+import Station from '@terra-money/station-connector'
 
 declare global {
   interface Window {
@@ -11,28 +11,28 @@ declare global {
 export default class StationWallet implements Wallet {
   async info() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error("Station extension not installed")
+    if (!window.station) throw new Error('Station extension not installed')
 
     return await window.station.info()
   }
 
   async connect() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error("Station extension not installed")
+    if (!window.station) throw new Error('Station extension not installed')
 
     return await window.station.connect()
   }
 
   async getPubkey() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error("Station extension not installed")
+    if (!window.station) throw new Error('Station extension not installed')
 
     return await window.station.getPublicKey()
   }
 
   async post(tx: CreateTxOptions) {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error("Station extension not installed")
+    if (!window.station) throw new Error('Station extension not installed')
 
     // is the chain classic?
     const networks = await this.info()
@@ -43,7 +43,7 @@ export default class StationWallet implements Wallet {
         ...tx,
         ...(tx.fee ? { fee: JSON.stringify(tx.fee.toData()) } : {}),
         msgs: tx.msgs.map((msg) => JSON.stringify(msg.toData(isClassic))),
-      })
+      }),
     )
 
     return await window.station.post(data)
@@ -51,7 +51,7 @@ export default class StationWallet implements Wallet {
 
   async sign(tx: CreateTxOptions) {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error("Station extension not installed")
+    if (!window.station) throw new Error('Station extension not installed')
 
     // is the chain classic?
     const networks = await this.info()
@@ -62,7 +62,7 @@ export default class StationWallet implements Wallet {
         ...tx,
         ...(tx.fee ? { fee: JSON.stringify(tx.fee.toData()) } : {}),
         msgs: tx.msgs.map((msg) => JSON.stringify(msg.toData(isClassic))),
-      })
+      }),
     )
 
     return await window.station.sign(data)
@@ -76,10 +76,10 @@ export default class StationWallet implements Wallet {
 
     switch (event) {
       case EventTypes.NetworkChange:
-        window.addEventListener("station_network_change", listener)
+        window.addEventListener('station_network_change', listener)
         break
       case EventTypes.WalletChange:
-        window.addEventListener("station_wallet_change", listener)
+        window.addEventListener('station_wallet_change', listener)
         break
     }
   }
@@ -91,12 +91,12 @@ export default class StationWallet implements Wallet {
     switch (event) {
       case EventTypes.NetworkChange:
         listeners.map((l) =>
-          window.removeEventListener("station_network_change", l)
+          window.removeEventListener('station_network_change', l),
         )
         break
       case EventTypes.WalletChange:
         listeners.map((l) =>
-          window.removeEventListener("station_wallet_change", l)
+          window.removeEventListener('station_wallet_change', l),
         )
         break
     }
@@ -106,30 +106,30 @@ export default class StationWallet implements Wallet {
 
   isInstalled = !!window?.station
 
-  id = "station-extension"
+  id = 'station-extension'
 
   details = {
-    name: "Station (Extension)",
-    icon: "https://station-assets.terra.dev/img/station.png",
-    website: "https://setup.station.money/",
+    name: 'Station (Extension)',
+    icon: 'https://station-assets.terra.dev/img/station.png',
+    website: 'https://setup.station.money/',
   }
 
   // helpers
   private async _waitWindowLoad() {
-    if (document.readyState === "complete") return
+    if (document.readyState === 'complete') return
 
     return new Promise((resolve) => {
       const documentStateChange = (event: Event) => {
         if (
           event.target &&
-          (event.target as Document).readyState === "complete"
+          (event.target as Document).readyState === 'complete'
         ) {
           resolve(undefined)
-          document.removeEventListener("readystatechange", documentStateChange)
+          document.removeEventListener('readystatechange', documentStateChange)
         }
       }
 
-      document.addEventListener("readystatechange", documentStateChange)
+      document.addEventListener('readystatechange', documentStateChange)
     })
   }
 }
