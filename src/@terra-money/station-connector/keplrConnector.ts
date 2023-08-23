@@ -1,4 +1,4 @@
-import { AminoSignResponse, StdSignDoc, coin, coins } from "@cosmjs/amino"
+import { AminoSignResponse, StdSignDoc } from "@cosmjs/amino"
 import StationOfflineSigner from "./cosmjsOfflineSigner"
 import { bech32 } from "bech32"
 import axios from "axios"

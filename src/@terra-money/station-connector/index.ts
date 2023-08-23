@@ -136,7 +136,7 @@ export default class Station {
     })
   }
 
-  async post(tx: TxRequest, purgeQueue = false): Promise<PostResponse> {
+  async post(tx: TxRequest, purgeQueue = true): Promise<PostResponse> {
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage(
@@ -150,7 +150,7 @@ export default class Station {
     })
   }
 
-  async sign(tx: TxRequest, purgeQueue = false): Promise<SignResponse> {
+  async sign(tx: TxRequest, purgeQueue = true): Promise<SignResponse> {
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage(
@@ -166,7 +166,7 @@ export default class Station {
 
   async signBytes(
     bytes: string,
-    purgeQueue = false,
+    purgeQueue = true,
   ): Promise<SignBytesResponse> {
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()

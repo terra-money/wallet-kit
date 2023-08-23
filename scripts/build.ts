@@ -17,23 +17,23 @@ build({
     } = computedPackageJson;
 
     if ('react' in dependencies) {
+      peerDependencies['react'] = dependencies['react'];
       delete dependencies['react'];
-      peerDependencies['react'] = '>=17.0.0';
     }
 
     if ('react-dom' in dependencies) {
+      peerDependencies['react-dom'] = dependencies['react-dom'];
       delete dependencies['react-dom'];
-      peerDependencies['react-dom'] = '>=17.0.0';
     }
 
     if ('react-router-dom' in dependencies) {
+      peerDependencies['react-router-dom'] = dependencies['react-router-dom'];
       delete dependencies['react-router-dom'];
-      peerDependencies['react-router-dom'] = '>=5.0.0';
     }
 
     if ('styled-components' in dependencies) {
+      peerDependencies['styled-components'] = dependencies['styled-components'];
       delete dependencies['styled-components'];
-      peerDependencies['styled-components'] = '>=5.0.0';
     }
 
     if ('rxjs' in dependencies) {
@@ -41,10 +41,20 @@ build({
     }
 
     if ('@terra-money/feather.js' in dependencies) {
+      peerDependencies['@terra-money/feather.js'] = dependencies['@terra-money/feather.js'];
       delete dependencies['@terra-money/feather.js'];
-      peerDependencies['@terra-money/feather.js'] = '^1.0.4';
     }
 
+    if ('@cosmjs/amino' in dependencies) {
+      peerDependencies['@cosmjs/amino'] = dependencies['@cosmjs/amino'];
+      delete dependencies['@cosmjs/amino'];
+    }
+
+    if ('axios' in dependencies) {
+      peerDependencies['axios'] = dependencies['axios'];
+      delete dependencies['axios'];
+    }
+    
     computedPackageJson.dependencies =
       Object.keys(dependencies).length > 0 ? dependencies : undefined;
 
