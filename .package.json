@@ -3,7 +3,7 @@
   "license": "Apache-2.0",
   "repository": "git://github:terra-money/wallet-kit",
   "bugs": "https://github.com/terra-money/wallet-kit/issues",
-  "homepage": "https://github.com/terra-money/wallet-kit",
+  "homepage": "https://github.com/terra-money/wallet-kit/tree/main/packages/src/{name}",
   "engines": {
     "node": ">=16"
   },
