@@ -11,28 +11,28 @@ declare global {
 export default class StationWallet implements Wallet {
   async info() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
     return await window.station.info()
   }
 
   async connect() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
     return await window.station.connect()
   }
 
   async getPubkey() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
     return await window.station.getPublicKey()
   }
 
   async post(tx: CreateTxOptions) {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
     // is the chain classic?
     const networks = await this.info()
@@ -51,7 +51,7 @@ export default class StationWallet implements Wallet {
 
   async sign(tx: CreateTxOptions) {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
     // is the chain classic?
     const networks = await this.info()
@@ -115,6 +115,12 @@ export default class StationWallet implements Wallet {
   }
 
   // helpers
+  private assureStationWalletIsAvailable(): void {
+    if (!window.station) throw new Error('Station extension not installed')
+    // station.terra.money has a div with id station
+    if (window.station instanceof HTMLElement) throw new Error('Station extension not installed') 
+  }
+
   private async _waitWindowLoad() {
     if (document.readyState === 'complete') return
 
