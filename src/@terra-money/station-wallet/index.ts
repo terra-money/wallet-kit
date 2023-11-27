@@ -11,28 +11,28 @@ declare global {
 export default class StationWallet implements Wallet {
   async info() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
-    return await window.station.info()
+    return await window.station!.info()
   }
 
   async connect() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
-    return await window.station.connect()
+    return await window.station!.connect()
   }
 
   async getPubkey() {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
-    return await window.station.getPublicKey()
+    return await window.station!.getPublicKey()
   }
 
   async post(tx: CreateTxOptions) {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
     // is the chain classic?
     const networks = await this.info()
@@ -46,12 +46,12 @@ export default class StationWallet implements Wallet {
       }),
     )
 
-    return await window.station.post(data)
+    return await window.station!.post(data)
   }
 
   async sign(tx: CreateTxOptions) {
     await this._waitWindowLoad()
-    if (!window.station) throw new Error('Station extension not installed')
+    this.assureStationWalletIsAvailable()
 
     // is the chain classic?
     const networks = await this.info()
@@ -65,7 +65,7 @@ export default class StationWallet implements Wallet {
       }),
     )
 
-    return await window.station.sign(data)
+    return await window.station!.sign(data)
   }
 
   private listeners: Record<string, ((e: any) => void)[]> = {}
@@ -104,7 +104,7 @@ export default class StationWallet implements Wallet {
     delete this.listeners[event]
   }
 
-  isInstalled = !!window?.station
+  isInstalled = !!window?.station && !(window.station instanceof HTMLElement)
 
   id = 'station-extension'
 
@@ -115,6 +115,11 @@ export default class StationWallet implements Wallet {
   }
 
   // helpers
+  private assureStationWalletIsAvailable(): void {
+    if (!window.station || window.station instanceof HTMLElement)
+      throw new Error('Station extension not installed')
+  }
+
   private async _waitWindowLoad() {
     if (document.readyState === 'complete') return
 
