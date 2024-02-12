@@ -1,6 +1,6 @@
 {
   "name": "wallet-kit",
-  "version": "1.0.16",
+  "version": "1.0.17-beta.6",
   "description": "new version of wallet-provider",
   "main": "index.js",
   "scripts": {
