@@ -1,3 +1,4 @@
+import { PublicKey } from '@terra-money/feather.js'
 import StationOfflineSigner from './cosmjsOfflineSigner'
 import KeplrConnector from './keplrConnector'
 
@@ -55,6 +56,11 @@ export type SignResponse = {
   auth_info: Object
   body: Object
   signatures: string[]
+}
+
+export type SignArbitraryResponse = {
+  pub_key: PublicKey.Data
+  signature: string
 }
 
 export type SignBytesResponse = {
@@ -205,16 +211,15 @@ export default class Station {
     bytes: string,
     chainID?: string,
     purgeQueue = true,
-  ): Promise<SignResponse> {
+  ): Promise<SignArbitraryResponse> {
     const fixedPurgeQueue = typeof chainID !== 'string' ? chainID : purgeQueue
     const fixedChainID = typeof chainID === 'string' ? chainID : undefined
 
     return new Promise((resolve, reject) => {
-      // make sure bytes are base64 encoded
-      const base64regex =
-        /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
-
-      if (typeof bytes !== 'string' || !base64regex.test(bytes)) {
+      if (
+        typeof bytes !== 'string' ||
+        Buffer.from(bytes, 'base64').toString('base64') !== bytes
+      ) {
         reject('Bytes must be a base64 encoded string.')
       }
 
@@ -233,7 +238,15 @@ export default class Station {
         reqID,
       )
       this._pendingRequests[reqID] = {
-        resolve: (data: any) => resolve(data.result),
+        resolve: (data: any) => {
+          const result = {
+            pub_key: PublicKey.fromData(
+              data.result.auth_info.signer_infos[0].public_key as any,
+            ).toData(),
+            signature: data.result.signatures[0],
+          }
+          resolve(result)
+        },
         reject,
       }
     })

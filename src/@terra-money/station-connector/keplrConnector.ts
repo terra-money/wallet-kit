@@ -133,15 +133,10 @@ export default class KeplrConnector {
         'Signature failed, empty response received from the extension.',
       )
 
-    const signature: StdSignature = {
-      pub_key: PublicKey.fromData(
-        // @ts-expect-error
-        response.auth_info.signer_infos[0].public_key as any,
-      ).toAmino(),
-      signature: response.signatures[0],
+    return {
+      ...response,
+      pub_key: PublicKey.fromData(response.pub_key).toAmino(),
     }
-
-    return signature
   }
 
   async signDirect(...args: any): Promise<any> {
