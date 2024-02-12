@@ -166,12 +166,70 @@ export default class Station {
 
   async signBytes(
     bytes: string,
+    chainID?: string,
     purgeQueue = true,
   ): Promise<SignBytesResponse> {
+    const fixedPurgeQueue = typeof chainID !== 'string' ? chainID : purgeQueue
+    const fixedChainID = typeof chainID === 'string' ? chainID : undefined
+
     return new Promise((resolve, reject) => {
+      // make sure bytes are base64 encoded
+      const base64regex =
+        /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
+
+      if (typeof bytes !== 'string' || !base64regex.test(bytes)) {
+        reject('Bytes must be a base64 encoded string.')
+      }
+
       const reqID = crypto.randomUUID()
       this._sendMessage(
-        { type: 'sign', data: { bytes, purgeQueue, id: Date.now() } },
+        {
+          type: 'sign',
+          data: {
+            bytes,
+            purgeQueue: fixedPurgeQueue,
+            id: Date.now(),
+            chainID: fixedChainID,
+          },
+        },
+        reqID,
+      )
+      this._pendingRequests[reqID] = {
+        resolve: (data: any) => resolve(data.result),
+        reject,
+      }
+    })
+  }
+
+  async signArbitrary(
+    bytes: string,
+    chainID?: string,
+    purgeQueue = true,
+  ): Promise<SignResponse> {
+    const fixedPurgeQueue = typeof chainID !== 'string' ? chainID : purgeQueue
+    const fixedChainID = typeof chainID === 'string' ? chainID : undefined
+
+    return new Promise((resolve, reject) => {
+      // make sure bytes are base64 encoded
+      const base64regex =
+        /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
+
+      if (typeof bytes !== 'string' || !base64regex.test(bytes)) {
+        reject('Bytes must be a base64 encoded string.')
+      }
+
+      const reqID = crypto.randomUUID()
+      this._sendMessage(
+        {
+          type: 'sign',
+          data: {
+            bytes,
+            adr036: true,
+            purgeQueue: fixedPurgeQueue,
+            id: Date.now(),
+            chainID: fixedChainID,
+          },
+        },
         reqID,
       )
       this._pendingRequests[reqID] = {
