@@ -326,8 +326,8 @@ export default class TerraStationMobileWallet implements Wallet {
   id = "terra-station-mobile"
 
   details = {
-    name: "Terra Station (Mobile)",
-    icon: "https://station-assets.terra.dev/img/walletconnect.svg",
+    name: "Station Mobile App",
+    icon: "https://station-assets.terra.dev/img/connect-mobile.svg",
     website: "https://setup.station.money/",
   }
 }

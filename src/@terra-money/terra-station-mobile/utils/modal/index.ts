@@ -131,7 +131,7 @@ function createModalElement({
     // button
     const button = document.createElement("button")
     button.addEventListener("click", openTerraStationMobile)
-    button.textContent = "Open Terra Station Mobile"
+    button.textContent = "Open Station Mobile"
 
     content.appendChild(button)
   } else {
