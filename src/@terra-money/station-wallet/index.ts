@@ -109,8 +109,8 @@ export default class StationWallet implements Wallet {
   id = 'station-extension'
 
   details = {
-    name: 'Station (Extension)',
-    icon: 'https://station-assets.terra.dev/img/station.png',
+    name: 'Browser Extension',
+    icon: 'https://station-assets.terra.dev/img/connect-extension.svg',
     website: 'https://setup.station.money/',
   }
 
