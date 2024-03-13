@@ -29,17 +29,17 @@ interface WalletProviderProps {
 
 type WalletProviderState =
   | {
-      status: WalletStatus.CONNECTED
-      wallet: Wallet
-      connectedWallet: ConnectResponse
-      network: InfoResponse
-    }
+    status: WalletStatus.CONNECTED
+    wallet: Wallet
+    connectedWallet: ConnectResponse
+    network: InfoResponse
+  }
   | {
-      status: WalletStatus.INITIALIZING | WalletStatus.NOT_CONNECTED
-      network: InfoResponse
-      wallet?: undefined
-      connectedWallet?: undefined
-    }
+    status: WalletStatus.INITIALIZING | WalletStatus.NOT_CONNECTED
+    network: InfoResponse
+    wallet?: undefined
+    connectedWallet?: undefined
+  }
 
 function WalletProvider({
   children,
@@ -59,18 +59,23 @@ function WalletProvider({
       connectedID && availableWallets.find(({ id }) => id === connectedID)
 
     if (wallet) {
-      ;(async () => {
-        const [connectedWallet, network] = await Promise.all([
-          wallet.connect(),
-          wallet.info(),
-        ])
+      ; (async () => {
 
-        setState({
-          status: WalletStatus.CONNECTED,
-          wallet,
-          connectedWallet,
-          network,
-        })
+        try {
+          const [connectedWallet, network] = await Promise.all([
+            wallet.connect(),
+            wallet.info(),
+          ])
+
+          setState({
+            status: WalletStatus.CONNECTED,
+            wallet,
+            connectedWallet,
+            network,
+          })
+        } catch (error) {
+          console.error("Error while connecting wallet on startup", error)
+        }
       })()
 
       const networkCallback = (network: InfoResponse) => {
