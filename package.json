@@ -1,6 +1,6 @@
 {
   "name": "wallet-kit",
-  "version": "1.0.17-beta.6",
+  "version": "1.0.18-beta.0",
   "description": "new version of wallet-provider",
   "main": "index.js",
   "scripts": {
@@ -28,16 +28,16 @@
   },
   "peerDependencies": {
     "@cosmjs/amino": "^0.31.0",
-    "@terra-money/feather.js": "^1.0.8",
     "bech32": "^2.0.0",
+    "@terra-money/feather.js": "2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.15.0"
   },
   "devDependencies": {
     "@cosmjs/amino": "^0.31.0",
-    "@terra-money/feather.js": "^1.0.8",
     "@types/node": "^20.0.0",
+    "@terra-money/feather.js": "^2.1.0-beta.4",
     "@types/qrcode": "^1.5.1",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
