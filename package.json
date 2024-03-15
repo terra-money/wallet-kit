@@ -15,7 +15,7 @@
     "@walletconnect/iso-crypto": "^1.6.6",
     "@walletconnect/types": "^1.6.6",
     "@walletconnect/utils": "^1.6.6",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "bowser": "^2.11.0",
     "fast-deep-equal": "^3.1.3",
     "fix-hmr": "^1.0.2",
