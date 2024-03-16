@@ -1,6 +1,7 @@
-import { PublicKey } from '@terra-money/feather.js'
+import { Fee, PublicKey } from '@terra-money/feather.js'
 import StationOfflineSigner from './cosmjsOfflineSigner'
 import KeplrConnector from './keplrConnector'
+import { log } from './log'
 
 type NetworkName = 'mainnet' | 'testnet' | 'classic' | 'localterra'
 type ChainID = string
@@ -56,6 +57,7 @@ export type SignResponse = {
   auth_info: Object
   body: Object
   signatures: string[]
+  fee: Fee.Amino
 }
 
 export type SignArbitraryResponse = {
@@ -75,6 +77,7 @@ export default class Station {
     { resolve: (data: any) => void; reject: (data: any) => void }
   > = {}
   public keplr: KeplrConnector
+  public debugMode: boolean = false
 
   constructor() {
     const origin = window.location.origin
@@ -92,6 +95,8 @@ export default class Station {
         ? this._pendingRequests[reqID].resolve(data)
         : this._pendingRequests[reqID].reject(data?.error?.message ?? data)
       delete this._pendingRequests[reqID]
+
+      log('response sent', { reqID, data })
     })
 
     this.keplr = new KeplrConnector()
@@ -111,6 +116,7 @@ export default class Station {
   }
 
   async info(): Promise<InfoResponse> {
+    log("'info' request received")
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage({ type: 'interchain-info' }, reqID)
@@ -119,6 +125,7 @@ export default class Station {
   }
 
   async connect(): Promise<ConnectResponse> {
+    log("'connect' request received")
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage({ type: 'connect' }, reqID)
@@ -127,6 +134,7 @@ export default class Station {
   }
 
   async getPublicKey(): Promise<ConnectResponse> {
+    log("'pubKey' request received")
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage({ type: 'get-pubkey' }, reqID)
@@ -135,6 +143,7 @@ export default class Station {
   }
 
   async theme(): Promise<string> {
+    log("'theme' request received")
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage({ type: 'theme' }, reqID)
@@ -143,6 +152,7 @@ export default class Station {
   }
 
   async post(tx: TxRequest, purgeQueue = true): Promise<PostResponse> {
+    log("'post' request received", { tx, purgeQueue })
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage(
@@ -157,6 +167,7 @@ export default class Station {
   }
 
   async sign(tx: TxRequest, purgeQueue = true): Promise<SignResponse> {
+    log("'sign' request received", { tx, purgeQueue })
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage(
@@ -175,6 +186,7 @@ export default class Station {
     chainID?: string,
     purgeQueue = true,
   ): Promise<SignBytesResponse> {
+    log("'signBytes' request received", { bytes, chainID, purgeQueue })
     const fixedPurgeQueue = typeof chainID !== 'string' ? chainID : purgeQueue
     const fixedChainID = typeof chainID === 'string' ? chainID : undefined
 
@@ -212,6 +224,7 @@ export default class Station {
     chainID?: string,
     purgeQueue = true,
   ): Promise<SignArbitraryResponse> {
+    log("'signArbitrary' request received", { bytes, chainID, purgeQueue })
     const fixedPurgeQueue = typeof chainID !== 'string' ? chainID : purgeQueue
     const fixedChainID = typeof chainID === 'string' ? chainID : undefined
 
@@ -256,6 +269,7 @@ export default class Station {
     network: NetworkName,
     purgeQueue = true,
   ): Promise<{ success: true; network: NetworkName }> {
+    log("'switchNetwork' request received", { network, purgeQueue })
     return new Promise((resolve, reject) => {
       const reqID = crypto.randomUUID()
       this._sendMessage(

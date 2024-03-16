@@ -3,6 +3,7 @@ import StationOfflineSigner from './cosmjsOfflineSigner'
 import { bech32 } from 'bech32'
 import axios from 'axios'
 import { PublicKey } from '@terra-money/feather.js'
+import { log } from './log'
 
 export type GetKeyResponse = {
   // Name of the selected key store.
@@ -65,26 +66,33 @@ export default class KeplrConnector {
   readonly mode = 'extension'
 
   getOfflineSigner(chainID: string): StationOfflineSigner {
+    log("'getOfflineSigner' requested")
     return new StationOfflineSigner(chainID)
   }
 
   getOfflineSignerOnlyAmino(chainID: string): StationOfflineSigner {
+    log("'getOfflineSignerOnlyAmino' requested")
     return new StationOfflineSigner(chainID)
   }
 
   async getOfflineSignerAuto(chainID: string): Promise<StationOfflineSigner> {
+    log("'getOfflineSignerAuto' requested")
     return new StationOfflineSigner(chainID)
   }
 
   async enable(chainID: string | string[]): Promise<void> {
+    log("'enable' requested", { chainID })
     if (!window.station) throw new Error('Station not available')
 
     await window.station.connect()
   }
 
-  async disable(chainID?: string | string[]): Promise<void> {}
+  async disable(chainID?: string | string[]): Promise<void> {
+    log("'disable' requested", { chainID })
+  }
 
   async getKey(chainID: string): Promise<GetKeyResponse> {
+    log("'getKey' requested", { chainID })
     if (!window.station) throw new Error('Station not available')
 
     const info = (await window.station.info())[chainID]
@@ -97,7 +105,7 @@ export default class KeplrConnector {
       connectedWallet.pubkey?.[info.coinType] ??
       ((await window.station.getPublicKey()).pubkey?.[info.coinType] as string)
 
-    return {
+    const result = {
       name: connectedWallet.name,
       algo: 'secp256k1',
       pubKey: Buffer.from(pubkey, 'base64'),
@@ -108,6 +116,10 @@ export default class KeplrConnector {
       // since protobuf is not supported by Station, we set this as true
       isNanoLedger: true,
     }
+
+    log("'getKey' result", result)
+
+    return result
   }
 
   async signAmino(
@@ -115,8 +127,9 @@ export default class KeplrConnector {
     signer: string,
     signDoc: StdSignDoc,
   ): Promise<AminoSignResponse> {
+    log("'signAmino' requested", { chainID, signer, signDoc })
     const offlineSigner = this.getOfflineSigner(chainID)
-    return offlineSigner.signAmino(signer, signDoc)
+    return await offlineSigner.signAmino(signer, signDoc) 
   }
 
   async signArbitrary(
@@ -124,6 +137,7 @@ export default class KeplrConnector {
     _: string,
     data: string | Uint8Array,
   ): Promise<StdSignature> {
+    log("'signArbitrary' requested", { chainID, _, data })
     const parsedData = Buffer.from(data).toString('base64')
 
     const response = await window.station?.signArbitrary(parsedData, chainID)
@@ -133,13 +147,18 @@ export default class KeplrConnector {
         'Signature failed, empty response received from the extension.',
       )
 
-    return {
+    const result = {
       ...response,
       pub_key: PublicKey.fromData(response.pub_key).toAmino(),
     }
+
+    log("'signArbitrary' result", result)
+
+    return result
   }
 
   async signDirect(...args: any): Promise<any> {
+    log("'signDirect' requested", args)
     throw new Error('signDirect not supported by Station')
   }
 

@@ -5,7 +5,8 @@ import {
   StdSignDoc,
   StdSignature,
 } from '@cosmjs/amino'
-import { Fee, Msg, SignatureV2 } from '@terra-money/feather.js'
+import { Fee, Msg, SignDoc, SignatureV2 } from '@terra-money/feather.js'
+import { log } from './log'
 
 export default class StationOfflineSigner implements OfflineAminoSigner {
   private chainID: string
@@ -59,7 +60,7 @@ export default class StationOfflineSigner implements OfflineAminoSigner {
       )
     if (addresses[this.chainID] !== signerAddress)
       throw new Error(
-        `Account mismatch: you are trying to sign a tx with ${signerAddress}, but you address on ${
+        `Account mismatch: you are trying to sign a tx with ${signerAddress}, but your address on ${
           this.chainID
         } is ${addresses[this.chainID]}.`,
       )
@@ -97,15 +98,19 @@ export default class StationOfflineSigner implements OfflineAminoSigner {
       signature: signResponse.signatures[0],
     }
 
-    return {
+    // @ts-expect-error
+    delete signDoc['timeout_height']
+
+    const result = {
       signed: {
         ...signDoc,
-        fee: {
-          ...signDocFee,
-          amount: [{ denom: feeDenom, amount: feeAmount }],
-        },
+        fee: signResponse.fee,
       },
       signature,
     }
+
+    log("'signAmino' result", result)
+
+    return result
   }
 }
