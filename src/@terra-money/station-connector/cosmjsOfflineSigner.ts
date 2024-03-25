@@ -5,7 +5,14 @@ import {
   StdSignDoc,
   StdSignature,
 } from '@cosmjs/amino'
-import { Fee, Msg, SignDoc, SignatureV2 } from '@terra-money/feather.js'
+import {
+  Coin,
+  Coins,
+  Fee,
+  Msg,
+  SignDoc,
+  SignatureV2,
+} from '@terra-money/feather.js'
 import { log } from './log'
 
 export default class StationOfflineSigner implements OfflineAminoSigner {
@@ -87,7 +94,18 @@ export default class StationOfflineSigner implements OfflineAminoSigner {
     const signResponse = await window.station.sign({
       chainID: signDoc.chain_id,
       msgs: fakeMsgs,
-      fee: new Fee(gas, feeFixedAmount, signDocFee.payer, signDocFee.granter),
+      fee: new Fee(
+        gas,
+        signDocFee.amount.length > 1
+          ? new Coins(
+              signDocFee.amount.map(
+                ({ denom, amount }) => new Coin(denom, amount),
+              ),
+            )
+          : feeFixedAmount,
+        signDocFee.payer,
+        signDocFee.granter,
+      ),
       memo: signDoc.memo,
       signMode: SignatureV2.SignMode.SIGN_MODE_LEGACY_AMINO_JSON,
     } as any)
